@@ -1,6 +1,6 @@
 {
-    "name": "web_dashboard",
-    "short_name": "web_dashboard",
+    "name": "testnav",
+    "short_name": "testnav",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
