@@ -7,7 +7,6 @@ import 'login.dart';
 import 'navbar.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(const MyApp());
@@ -22,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Coaches Dashboard",
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Color.fromARGB(255, 50, 50, 48),
         textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme)
             .apply(bodyColor: Colors.black),
         pageTransitionsTheme: PageTransitionsTheme(builders: {
@@ -39,4 +38,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

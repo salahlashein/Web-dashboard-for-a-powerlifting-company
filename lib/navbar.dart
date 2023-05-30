@@ -26,6 +26,7 @@ class _NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 50, 50, 48),
         automaticallyImplyLeading: false, // This will remove the back button
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -57,36 +58,57 @@ class _NavbarState extends State<Navbar> {
       body: Row(
         children: [
           NavigationRail(
+            backgroundColor: Color.fromARGB(255, 50, 50, 48),
             selectedIndex: _selectedIndex,
             onDestinationSelected: _onItemTapped,
             labelType: NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
                 icon: Icon(Icons.library_books),
-                selectedIcon: Icon(Icons.library_books, size: 30),
+                selectedIcon: Icon(
+                  Icons.library_books,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
                 label: Text('Exercise Library',
                     style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.layers),
-                selectedIcon: Icon(Icons.layers, size: 30),
+                selectedIcon: Icon(
+                  Icons.layers,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
                 label: Text('Templates', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.people),
-                selectedIcon: Icon(Icons.people, size: 30),
+                selectedIcon: Icon(
+                  Icons.people,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
                 label: Text('Athlete Overview',
                     style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.list),
-                selectedIcon: Icon(Icons.list, size: 30),
+                selectedIcon: Icon(
+                  Icons.list,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
                 label:
                     Text('Athlete List', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.chat),
-                selectedIcon: Icon(Icons.chat, size: 30),
+                selectedIcon: Icon(
+                  Icons.chat,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
                 label: Text('Chat', style: TextStyle(color: Colors.white)),
               ),
             ],
