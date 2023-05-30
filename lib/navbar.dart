@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class Navbar extends StatefulWidget {
   @override
   _NavbarState createState() => _NavbarState();
@@ -8,7 +9,6 @@ class _NavbarState extends State<Navbar> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-    Text('Dashboard Page', style: TextStyle(color: Colors.white)),
     Text('Exercise Library Page', style: TextStyle(color: Colors.white)),
     Text('Templates Page', style: TextStyle(color: Colors.white)),
     Text('Athlete Overview Page', style: TextStyle(color: Colors.white)),
@@ -62,15 +62,10 @@ class _NavbarState extends State<Navbar> {
             labelType: NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.dashboard),
-                selectedIcon: Icon(Icons.dashboard, size: 30),
-                label: Text('Dashboard', style: TextStyle(color: Colors.white)),
-              ),
-              NavigationRailDestination(
                 icon: Icon(Icons.library_books),
                 selectedIcon: Icon(Icons.library_books, size: 30),
-                label: Text(
-                    'Exercise Library', style: TextStyle(color: Colors.white)),
+                label: Text('Exercise Library',
+                    style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.layers),
@@ -80,14 +75,14 @@ class _NavbarState extends State<Navbar> {
               NavigationRailDestination(
                 icon: Icon(Icons.people),
                 selectedIcon: Icon(Icons.people, size: 30),
-                label: Text(
-                    'Athlete Overview', style: TextStyle(color: Colors.white)),
+                label: Text('Athlete Overview',
+                    style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.list),
                 selectedIcon: Icon(Icons.list, size: 30),
-                label: Text(
-                    'Athlete List', style: TextStyle(color: Colors.white)),
+                label:
+                    Text('Athlete List', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.chat),
