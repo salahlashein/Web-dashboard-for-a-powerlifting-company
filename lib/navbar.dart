@@ -26,6 +26,8 @@ class _NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        //<-- SEE HERE
+
         backgroundColor: Color.fromARGB(255, 50, 50, 48),
         automaticallyImplyLeading: false, // This will remove the back button
         title: Row(
@@ -64,7 +66,7 @@ class _NavbarState extends State<Navbar> {
             labelType: NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.library_books),
+                icon: Icon(Icons.library_books, color: Colors.white),
                 selectedIcon: Icon(
                   Icons.library_books,
                   size: 30,
@@ -74,7 +76,7 @@ class _NavbarState extends State<Navbar> {
                     style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.layers),
+                icon: Icon(Icons.layers, color: Colors.white),
                 selectedIcon: Icon(
                   Icons.layers,
                   size: 30,
@@ -83,7 +85,7 @@ class _NavbarState extends State<Navbar> {
                 label: Text('Templates', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.people),
+                icon: Icon(Icons.people, color: Colors.white),
                 selectedIcon: Icon(
                   Icons.people,
                   size: 30,
@@ -93,7 +95,7 @@ class _NavbarState extends State<Navbar> {
                     style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.list),
+                icon: Icon(Icons.list, color: Colors.white),
                 selectedIcon: Icon(
                   Icons.list,
                   size: 30,
@@ -103,7 +105,7 @@ class _NavbarState extends State<Navbar> {
                     Text('Athlete List', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.chat),
+                icon: Icon(Icons.chat, color: Colors.white),
                 selectedIcon: Icon(
                   Icons.chat,
                   size: 30,
