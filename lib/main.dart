@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'Register.dart';
 import 'login.dart';
 import 'navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,9 +43,10 @@ class MyApp extends StatelessWidget {
         }),
         primaryColor: Colors.white,
       ),
-      initialRoute: '/Login',
+      initialRoute: '/SignUp',
       routes: {
-        '/Login': (context) => const Login(),
+        '/login': (context) => const Login(),
+        '/SignUp': (context) => const SignUp(),
         '/Navbar': (context) => Navbar(),
       },
     );

@@ -30,29 +30,37 @@ class _NavbarState extends State<Navbar> {
 
         backgroundColor: Color.fromARGB(255, 50, 50, 48),
         automaticallyImplyLeading: false, // This will remove the back button
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        title: Column(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://i.pravatar.cc/300'), // Replace this with your image link
-            ),
-            SizedBox(width: 10),
-            Text('User Name', style: TextStyle(color: Colors.white)),
-            // Replace this with the user's name
-            SizedBox(width: 20),
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                // Add your action for settings icon here
-              },
-            ),
-            SizedBox(width: 10),
-            IconButton(
-              icon: Icon(Icons.notifications),
-              onPressed: () {
-                // Add your action for notification icon here
-              },
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(width: 10),
+
+                // Replace this with the user's name
+                SizedBox(width: 20),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    // Add your action for settings icon here
+                  },
+                ),
+                SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(Icons.notifications),
+                  onPressed: () {
+                    // Add your action for notification icon here
+                  },
+                ),
+                SizedBox(width: 10),
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                ),
+                SizedBox(width: 10),
+                Text('Salah lashein', style: TextStyle(color: Colors.white)),
+                SizedBox(width: 10),
+              ],
             ),
           ],
         ),
