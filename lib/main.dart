@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:web_dashboard/details_screen/details_screen.dart';
+import 'package:web_dashboard/setting_screen/setting.dart';
 
 import 'Register.dart';
 import 'login.dart';
@@ -43,11 +45,13 @@ class MyApp extends StatelessWidget {
         }),
         primaryColor: Colors.white,
       ),
-      initialRoute: '/SignUp',
+      initialRoute: '/details',
       routes: {
         '/login': (context) => const Login(),
         '/SignUp': (context) => const SignUp(),
         '/Navbar': (context) => Navbar(),
+        '/details': (context) => const DetailsScreen(),
+        '/settings': (context) => const SettingScreen(),
       },
     );
   }
