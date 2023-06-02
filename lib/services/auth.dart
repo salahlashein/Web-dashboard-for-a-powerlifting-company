@@ -37,7 +37,10 @@ class AuthService {
 
       final user = authResult.user;
       if (user != null) {
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        await FirebaseFirestore.instance
+            .collection('Coaches')
+            .doc(user.uid)
+            .set({
           'firstName': firstName,
           'lastName': lastName,
           'email': email,

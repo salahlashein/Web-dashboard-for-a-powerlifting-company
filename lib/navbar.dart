@@ -7,6 +7,7 @@ class Navbar extends StatefulWidget {
 
 class _NavbarState extends State<Navbar> {
   int _selectedIndex = 0;
+  String _coachName = '';
 
   final List<Widget> _widgetOptions = <Widget>[
     Text('Exercise Library Page', style: TextStyle(color: Colors.white)),
@@ -23,23 +24,106 @@ class _NavbarState extends State<Navbar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadCoachName();
+  }
+
+  Future<void> _loadCoachName() async {
+    // Load coach name from Firebase or any other data source
+    // Replace the code below with your own implementation
+    await Future.delayed(
+        Duration(seconds: 2)); // Simulating asynchronous operation
+    setState(() {
+      _coachName = 'Salah lashein';
+    });
+  }
+
+  void _showAddAthleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String athleteEmail = '';
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(
+              horizontal: 16.0), // Adjust the horizontal padding
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Container(
+            width: 450.0, // Set a specific width for the dialog
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Enter your athlete\'s email to send the code',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                SizedBox(height: 20.0),
+                TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    athleteEmail = value;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintText: 'Enter athlete\'s email',
+                    hintStyle: TextStyle(color: Colors.white),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    // Add your action for sending invitation here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromARGB(255, 9, 181, 152),
+                    minimumSize: Size(double.infinity, 40),
+                  ),
+                  child: Text(
+                    'Send Invitation',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //<-- SEE HERE
-
         backgroundColor: Color.fromARGB(255, 50, 50, 48),
-        automaticallyImplyLeading: false, // This will remove the back button
+        automaticallyImplyLeading: false,
         title: Column(
           children: [
-
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(width: 10),
-
-                // Replace this with the user's name
-                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _showAddAthleteDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromARGB(255, 9, 181, 152),
+                  ),
+                  child: Text('Add athlete'),
+                ),
+                SizedBox(width: 10),
                 IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: () {
@@ -58,7 +142,7 @@ class _NavbarState extends State<Navbar> {
                   backgroundColor: Colors.white,
                 ),
                 SizedBox(width: 10),
-                Text('Salah lashein', style: TextStyle(color: Colors.white)),
+                Text(_coachName, style: TextStyle(color: Colors.white)),
                 SizedBox(width: 10),
               ],
             ),
@@ -80,8 +164,10 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text('Exercise Library',
-                    style: TextStyle(color: Colors.white)),
+                label: Text(
+                  'Exercise Library',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.layers, color: Colors.white),
@@ -90,7 +176,10 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text('Templates', style: TextStyle(color: Colors.white)),
+                label: Text(
+                  'Templates',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.people, color: Colors.white),
@@ -99,8 +188,10 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text('Athlete Overview',
-                    style: TextStyle(color: Colors.white)),
+                label: Text(
+                  'Athlete Overview',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.list, color: Colors.white),
@@ -109,8 +200,10 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label:
-                    Text('Athlete List', style: TextStyle(color: Colors.white)),
+                label: Text(
+                  'Athlete List',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.chat, color: Colors.white),
@@ -119,7 +212,10 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text('Chat', style: TextStyle(color: Colors.white)),
+                label: Text(
+                  'Chat',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
