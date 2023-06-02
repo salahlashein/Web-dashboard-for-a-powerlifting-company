@@ -31,8 +31,7 @@ class _NavbarState extends State<Navbar> {
   @override
   void initState() {
     super.initState();
-    _loadCoachName();
-    EmailJS.init('YOUR_EMAILJS_USER_ID'); // Replace with your EmailJS user ID
+    _loadCoachName(); // Replace with your EmailJS user ID
   }
 
   Future<void> _loadCoachName() async {
@@ -96,9 +95,7 @@ class _NavbarState extends State<Navbar> {
                 ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: () {
-                    _sendInvitation(athleteEmail);
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 9, 181, 152),
                     minimumSize: Size(double.infinity, 40),
@@ -122,27 +119,10 @@ class _NavbarState extends State<Navbar> {
     return code;
   }
 
-  Future<void> _sendEmail(String email, String code) async {
-    var params = {
-      'code': code,
-      'email': email,
-    };
-
-    await Email.send('service_id', 'template_id', params, 'user_id', 'origin')
-        .then((value) => print('Email sent successfully: $value'))
-        .catchError((error) => print('Failed to send email: $error'));
-  }
-
   Future<void> _createAthleteAccount(String email, String code) async {
     await FirebaseFirestore.instance.collection('Athletes').doc(email).set({
       'randomCode': code,
     });
-  }
-
-  Future<void> _sendInvitation(String athleteEmail) async {
-    String code = _generateRandomCode();
-    await _sendEmail(athleteEmail, code);
-    await _createAthleteAccount(athleteEmail, code);
   }
 
   @override
