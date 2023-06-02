@@ -9,7 +9,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  var _isObscured;
+  var _isObscured = true;
   final _auth = FirebaseAuth.instance;
   late String _email;
   late String _password;
@@ -35,11 +35,38 @@ class _LoginState extends State<Login> {
         Navigator.pushNamed(context, '/Navbar');
       }
     } catch (e) {
-      print(e.toString());
-      // Handle login failure
+      if (e is FirebaseAuthException) {
+        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Error'),
+              content: Text(
+                  'No user found for that email or password is wrong. Please make sure you entered the correct email and password.'),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        print(e);
+      }
     }
   }
 
+  bool _isValidEmail(String email) {
+    final pattern = r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$';
+    final regExp = RegExp(pattern);
+    return regExp.hasMatch(email);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
@@ -47,24 +74,18 @@ class _LoginState extends State<Login> {
         child: Center(
           child: Column(
             children: [
-              SizedBox(
-                height: 150,
-              ),
+              SizedBox(height: 150),
               Container(
                 width: 400,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 80,
-                    ),
+                    SizedBox(height: 80),
                     Image(
                       image: AssetImage('images/logo.png'),
                       height: 80,
                     ),
-                    SizedBox(
-                      height: 40,
-                    ),
+                    SizedBox(height: 40),
                     Center(
                       child: Text(
                         ' SIGN IN',
@@ -74,9 +95,7 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 40,
-                    ),
+                    SizedBox(height: 40),
                     Container(
                       padding: EdgeInsets.all(10),
                       margin: EdgeInsets.all(10),
@@ -120,9 +139,7 @@ class _LoginState extends State<Login> {
                                 return null;
                               },
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
+                            SizedBox(height: 5),
                             TextFormField(
                               obscureText: _isObscured,
                               textInputAction: TextInputAction.done,
@@ -170,9 +187,7 @@ class _LoginState extends State<Login> {
                                 return null;
                               },
                             ),
-                            SizedBox(
-                              height: 20,
-                            ),
+                            SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: _signIn,
                               style: ButtonStyle(
@@ -193,9 +208,7 @@ class _LoginState extends State<Login> {
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
-                            SizedBox(
-                              height: 15,
-                            ),
+                            SizedBox(height: 15),
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(context, '/forgetpass');
@@ -205,16 +218,12 @@ class _LoginState extends State<Login> {
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
-                            SizedBox(
-                              height: 15,
-                            ),
+                            SizedBox(height: 15),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 15,
-                    ),
+                    SizedBox(height: 15),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -243,11 +252,5 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
-  }
-
-  bool _isValidEmail(String email) {
-    final pattern = r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$';
-    final regExp = RegExp(pattern);
-    return regExp.hasMatch(email);
   }
 }

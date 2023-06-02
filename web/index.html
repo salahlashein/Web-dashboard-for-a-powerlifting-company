@@ -31,7 +31,12 @@
 
   <title>testnav</title>
   <link rel="manifest" href="manifest.json">
-
+  <script src="https://cdn.emailjs.com/sdk/2.6.4/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init('qovCCH0OYTzo8NS_b');
+    })();
+  </script>
   <script>
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
