@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:web_dashboard/services/userservice.dart';
 
 class Navbar extends StatefulWidget {
@@ -31,7 +30,7 @@ class _NavbarState extends State<Navbar> {
   @override
   void initState() {
     super.initState();
-    _loadCoachName(); // Replace with your EmailJS user ID
+    _loadCoachName();
   }
 
   Future<void> _loadCoachName() async {
@@ -56,23 +55,24 @@ class _NavbarState extends State<Navbar> {
         String athleteEmail = '';
         return Dialog(
           insetPadding: EdgeInsets.symmetric(
-              horizontal: 16.0), // Adjust the horizontal padding
+            horizontal: 16.0,
+          ),
           backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: Container(
-            width: 450.0, // Set a specific width for the dialog
+            width: 450.0,
             padding: EdgeInsets.all(20.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Enter your athlete\'s email to send the code',
+                  'Enter your athlete\'s email',
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
+                TextField(
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
                     athleteEmail = value;
@@ -89,19 +89,18 @@ class _NavbarState extends State<Navbar> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
-                  validator: (value) => EmailValidator.validate(value!)
-                      ? null
-                      : "Please enter a valid email",
                 ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _createAthleteAccount(athleteEmail);
+                  },
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 9, 181, 152),
                     minimumSize: Size(double.infinity, 40),
                   ),
                   child: Text(
-                    'Send Invitation',
+                    'Add Athlete',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -113,78 +112,151 @@ class _NavbarState extends State<Navbar> {
     );
   }
 
-  String _generateRandomCode() {
-    final random = Random();
-    final code = List.generate(6, (_) => random.nextInt(10)).join();
-    return code;
+  Future<void> _createAthleteAccount(String athleteEmail) async {
+    try {
+      final String code = _generateRandomCode();
+      await FirebaseFirestore.instance
+          .collection('Athletes')
+          .doc(athleteEmail)
+          .set({
+        'randomCode': code,
+      });
+      print('Athlete account created successfully');
+    } catch (e) {
+      print('Error creating athlete account: $e');
+    }
   }
 
-  Future<void> _createAthleteAccount(String email, String code) async {
-    await FirebaseFirestore.instance.collection('Athletes').doc(email).set({
-      'randomCode': code,
-    });
+  String _generateRandomCode() {
+    final random = Random();
+    final code = List.generate(6, (index) => random.nextInt(10)).join();
+    return code;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        actions: [
-          PopupMenuButton(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                child: TextButton(
+        backgroundColor: Color.fromARGB(255, 50, 50, 48),
+        automaticallyImplyLeading: false,
+        title: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(width: 10),
+                ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
                     _showAddAthleteDialog(context);
                   },
-                  child: Text(
-                    'Add Athlete',
-                    style: TextStyle(color: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    primary: Color.fromARGB(255, 9, 181, 152),
                   ),
+                  child: Text('Add athlete'),
+                ),
+                SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/settings');
+                  },
+                ),
+                SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(Icons.notifications),
+                  onPressed: () {
+                    // Add your action for notification icon here
+                  },
+                ),
+                SizedBox(width: 10),
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                ),
+                SizedBox(width: 10),
+                Text(_coachName, style: TextStyle(color: Colors.white)),
+                SizedBox(width: 10),
+              ],
+            ),
+          ],
+        ),
+      ),
+      body: Row(
+        children: [
+          NavigationRail(
+            backgroundColor: Color.fromARGB(255, 50, 50, 48),
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            labelType: NavigationRailLabelType.selected,
+            destinations: [
+              NavigationRailDestination(
+                icon: Icon(Icons.library_books, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.library_books,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
+                label: Text(
+                  'Exercise Library',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.layers, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.layers,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
+                label: Text(
+                  'Templates',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.people, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.people,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
+                label: Text(
+                  'Athlete Overview',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.list, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.list,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
+                label: Text(
+                  'Athlete List',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.chat, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.chat,
+                  size: 30,
+                  color: Color.fromARGB(255, 9, 181, 152),
+                ),
+                label: Text(
+                  'Chat',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ],
-            icon: Icon(Icons.more_vert),
+          ),
+          VerticalDivider(thickness: 1, width: 1),
+          Expanded(
+            child: Center(
+              child: _widgetOptions.elementAt(_selectedIndex),
+            ),
           ),
         ],
-        title: Text(
-          'Welcome $_coachName',
-          style: TextStyle(fontSize: 20),
-        ),
-        backgroundColor: Color.fromARGB(255, 9, 181, 152),
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_online),
-            label: 'Exercise Library',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.format_list_bulleted),
-            label: 'Templates',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Athlete Overview',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_people),
-            label: 'Athlete List',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble),
-            label: 'Chat',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
       ),
     );
   }

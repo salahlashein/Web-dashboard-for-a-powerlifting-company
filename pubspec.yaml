@@ -39,13 +39,12 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.6.2
   cloud_firestore: ^4.8.0
-  mailer: ^6.0.1
-  sendgrid_mailer: ^0.1.3
-  flutter_email_sender: ^6.0.0
+
   webview_flutter: ^4.2.1
   html: ^0.15.3
   js: ^0.6.7
-  email_validator: ^2.1.17
+
+
 
 dev_dependencies:
   flutter_test:
