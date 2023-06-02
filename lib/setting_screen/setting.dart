@@ -15,14 +15,10 @@ class _SettingScreenState extends State<SettingScreen> {
   int selectedIndex = 0;
   List<Widget> screens = [
     const EditEmail(isEditProfile: true),
-    const Center(child: Text('page2')),
     const EditEmail(isEditProfile: false),
+    const Center(child: Text('page3')),
     const Center(child: Text('page4')),
     const Center(child: Text('page5')),
-    const Center(child: Text('page6')),
-    const Center(child: Text('page7')),
-    const Center(child: Text('page8')),
-    const Center(child: Text('page9')),
   ];
   @override
   Widget build(BuildContext context) {
@@ -116,7 +112,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             });
                           },
                           child: Text(
-                            'Prefrence',
+                            'Change Email',
                             style: TextStyle(
                                 color: selectedIndex == 1
                                     ? const Color(0xff5bc500)
@@ -134,7 +130,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             });
                           },
                           child: Text(
-                            'Change Email',
+                            'Change Password',
                             style: TextStyle(
                                 color: selectedIndex == 2
                                     ? const Color(0xff5bc500)
@@ -152,7 +148,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             });
                           },
                           child: Text(
-                            'Change Password',
+                            'Coach Billig',
                             style: TextStyle(
                                 color: selectedIndex == 3
                                     ? const Color(0xff5bc500)
@@ -170,81 +166,9 @@ class _SettingScreenState extends State<SettingScreen> {
                             });
                           },
                           child: Text(
-                            'FAQS',
-                            style: TextStyle(
-                                color: selectedIndex == 4
-                                    ? const Color(0xff5bc500)
-                                    : Colors.grey.shade400,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedIndex = 5;
-                            });
-                          },
-                          child: Text(
-                            'Branding',
-                            style: TextStyle(
-                                color: selectedIndex == 5
-                                    ? const Color(0xff5bc500)
-                                    : Colors.grey.shade400,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedIndex = 6;
-                            });
-                          },
-                          child: Text(
-                            'Storefront Scripts ',
-                            style: TextStyle(
-                                color: selectedIndex == 6
-                                    ? const Color(0xff5bc500)
-                                    : Colors.grey.shade400,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedIndex = 7;
-                            });
-                          },
-                          child: Text(
                             'Manage Billing',
                             style: TextStyle(
-                                color: selectedIndex == 7
-                                    ? const Color(0xff5bc500)
-                                    : Colors.grey.shade400,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedIndex = 8;
-                            });
-                          },
-                          child: Text(
-                            'Coach Billig',
-                            style: TextStyle(
-                                color: selectedIndex == 8
+                                color: selectedIndex == 4
                                     ? const Color(0xff5bc500)
                                     : Colors.grey.shade400,
                                 fontSize: 16,
