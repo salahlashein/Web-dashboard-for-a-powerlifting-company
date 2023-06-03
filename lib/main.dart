@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:web_dashboard/details_screen/details_screen.dart';
+import 'package:web_dashboard/forget_password.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
 
 import 'Register.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         '/Navbar': (context) => Navbar(),
         '/details': (context) => const DetailsScreen(),
         '/settings': (context) => const SettingScreen(),
+        '/forgetpass': (context) => const ForgetPassword(),
       },
     );
   }

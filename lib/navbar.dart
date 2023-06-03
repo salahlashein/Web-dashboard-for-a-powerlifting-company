@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:web_dashboard/services/userservice.dart';
 
 class Navbar extends StatefulWidget {
@@ -121,6 +122,59 @@ class _NavbarState extends State<Navbar> {
           .set({
         'randomCode': code,
       });
+
+      // Show dialog with the generated code
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.black,
+            title: Text('Athlete Added'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('The athlete has been successfully added.'),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Random Code:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.copy),
+                      onPressed: () {
+                        // Copy the code to the clipboard
+                        Clipboard.setData(ClipboardData(text: code));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Code copied to clipboard'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Text(
+                  code,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+
       print('Athlete account created successfully');
     } catch (e) {
       print('Error creating athlete account: $e');
@@ -139,44 +193,52 @@ class _NavbarState extends State<Navbar> {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 50, 50, 48),
         automaticallyImplyLeading: false,
-        title: Column(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    _showAddAthleteDialog(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 9, 181, 152),
-                  ),
-                  child: Text('Add athlete'),
-                ),
-                SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/settings');
-                  },
-                ),
-                SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(Icons.notifications),
-                  onPressed: () {
-                    // Add your action for notification icon here
-                  },
-                ),
-                SizedBox(width: 10),
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                ),
-                SizedBox(width: 10),
-                Text(_coachName, style: TextStyle(color: Colors.white)),
-                SizedBox(width: 10),
-              ],
+            SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: () {
+                _showAddAthleteDialog(context);
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color.fromARGB(255, 9, 181, 152),
+              ),
+              child: Text('Add athlete'),
             ),
+            SizedBox(width: 10),
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+            ),
+            SizedBox(width: 10),
+            IconButton(
+              icon: Icon(Icons.notifications),
+              onPressed: () {
+                // Add your action for notification icon here
+              },
+            ),
+            SizedBox(width: 10),
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              // Add your profile picture logic here
+              // Example:
+              // backgroundImage: NetworkImage('https://example.com/profile-image.jpg'),
+            ),
+            SizedBox(width: 10),
+            Text(_coachName, style: TextStyle(color: Colors.white)),
+            SizedBox(width: 10),
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/login', (route) => false);
+              },
+            ),
+            SizedBox(width: 10),
           ],
         ),
       ),

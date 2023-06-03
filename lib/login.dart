@@ -14,6 +14,7 @@ class _LoginState extends State<Login> {
   late String _email;
   late String _password;
   final _formKey = GlobalKey<FormState>();
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -33,26 +34,24 @@ class _LoginState extends State<Login> {
       );
       if (userCredential.user != null) {
         Navigator.pushNamed(context, '/Navbar');
+        print("Login successful");
       }
     } catch (e) {
       if (e is FirebaseAuthException) {
-        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Error'),
-              content: Text(
-                  'No user found for that email or password is wrong. Please make sure you entered the correct email and password.'),
-              actions: [
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          );
+        if (e.code == 'user-not-found') {
+          setState(() {
+            _errorMessage =
+                'Invalid email. Please enter a valid email address.';
+          });
+        } else if (e.code == 'wrong-password') {
+          setState(() {
+            _errorMessage =
+                'Invalid password. Please enter the correct password.';
+          });
+        } else {
+          setState(() {
+            _errorMessage = 'An error occurred. Please try again later.';
+          });
         }
       } else {
         print(e);
@@ -187,6 +186,13 @@ class _LoginState extends State<Login> {
                                 return null;
                               },
                             ),
+                            if (_errorMessage.isNotEmpty)
+                              Text(
+                                _errorMessage,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: _signIn,
@@ -214,7 +220,7 @@ class _LoginState extends State<Login> {
                                 Navigator.pushNamed(context, '/forgetpass');
                               },
                               child: Text(
-                                'forget Password',
+                                'Forget Password',
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
