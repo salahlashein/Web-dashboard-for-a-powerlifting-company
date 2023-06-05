@@ -43,6 +43,8 @@ dependencies:
   webview_flutter: ^4.2.1
   html: ^0.15.3
   js: ^0.6.7
+  calendar_timeline: ^1.1.2
+  flutter_chat_ui: ^1.6.8
 
 
 

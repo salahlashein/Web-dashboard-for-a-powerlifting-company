@@ -5,6 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:web_dashboard/services/userservice.dart';
 
+import 'athleteoverview.dart';
+import 'chatPage.dart';
+import 'exercise.dart';
+
 class Navbar extends StatefulWidget {
   @override
   _NavbarState createState() => _NavbarState();
@@ -15,11 +19,11 @@ class _NavbarState extends State<Navbar> {
   String _coachName = '';
 
   final List<Widget> _widgetOptions = <Widget>[
-    Text('Exercise Library Page', style: TextStyle(color: Colors.white)),
+    exercise(),
     Text('Templates Page', style: TextStyle(color: Colors.white)),
-    Text('Athlete Overview Page', style: TextStyle(color: Colors.white)),
+    HomePage(),
     Text('Athlete List Page', style: TextStyle(color: Colors.white)),
-    Text('Chat Page', style: TextStyle(color: Colors.white)),
+    chatPage(),
   ];
 
   void _onItemTapped(int index) {
