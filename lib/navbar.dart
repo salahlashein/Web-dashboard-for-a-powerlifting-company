@@ -21,7 +21,7 @@ class _NavbarState extends State<Navbar> {
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
     Text('Templates Page', style: TextStyle(color: Colors.white)),
-    HomePage(),
+    CalendarScreen(),
     Text('Athlete List Page', style: TextStyle(color: Colors.white)),
     chatPage(),
   ];
