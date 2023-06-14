@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 
+import '../../models/userdata.dart';
+
 class EditEmail extends StatefulWidget {
   final bool isEditProfile;
-  const EditEmail({super.key, required this.isEditProfile});
+  final userDataModel;
+  const EditEmail(
+      {super.key, required this.isEditProfile, required this.userDataModel});
 
   @override
   State<EditEmail> createState() => _EditEmailState();
 }
 
 class _EditEmailState extends State<EditEmail> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+
   @override
   Widget build(BuildContext context) {
+    emailController = TextEditingController(
+        text: widget.isEditProfile == true
+            ? widget.userDataModel.firstName
+            : widget.userDataModel.email);
+    passwordController = TextEditingController(
+        text:
+            widget.isEditProfile == true ? widget.userDataModel.lastName : '');
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -122,6 +134,7 @@ class _EditEmailState extends State<EditEmail> {
             onPressed: () {},
             style: ElevatedButton.styleFrom(
               maximumSize: const Size(150.0, 70.0),
+              backgroundColor: const Color(0xff5bc500),
             ),
             child: const Text(
               'Save Change',

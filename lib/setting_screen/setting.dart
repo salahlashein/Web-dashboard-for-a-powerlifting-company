@@ -1,8 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:web_dashboard/models/userdata.dart';
+
+import '../services/userservice.dart';
+import 'manage_billing.dart';
+import 'componant/change_password.dart';
 import 'componant/edit_email.dart';
+import 'coach_billing.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -12,16 +19,95 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  String _coachName = '';
+  List<CoachBillingModel> _coachBilling = [];
+  List<ManageBillingModel> _manageBilling = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  UserDataModel userData = UserDataModel(
+      firstName: 'firstName', lastName: 'lastName', email: 'email');
+  @override
+  void initState() {
+    super.initState();
+    _loadCoachName();
+  }
+
+  bool isLoading = false;
+  Future<void> _loadCoachName() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      log(user.toString());
+      log(user!.uid.toString());
+      if (user != null) {
+        var snapshot =
+            await _firestore.collection('Coaches').doc(user.uid).get();
+        if (snapshot.exists) {
+          setState(() {
+            userData = UserDataModel.fromJson(snapshot.data()!);
+            isLoading = false;
+          });
+          await _loadCoachBilling();
+        }
+      }
+    } catch (e) {
+      print('Error loading coach name: ${e.toString()}');
+    }
+  }
+
+  Future<void> _loadCoachBilling() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String coachId = user.uid;
+        List<CoachBillingModel> coachBilling =
+            await UserService().getCoachCoachBilling(coachId);
+        setState(() {
+          _coachBilling = coachBilling;
+          isLoading = false;
+        });
+        await _loadManageBilling();
+      }
+    } catch (e) {
+      print('Error loading coach name: ${e.toString()}');
+    }
+  }
+
+  Future<void> _loadManageBilling() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String coachId = user.uid;
+        List<ManageBillingModel> manageBilling =
+            await UserService().getCoachManageBilling(coachId);
+        setState(() {
+          _manageBilling = manageBilling;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading coach name: ${e.toString()}');
+    }
+  }
+
   int selectedIndex = 0;
-  List<Widget> screens = [
-    const EditEmail(isEditProfile: true),
-    const EditEmail(isEditProfile: false),
-    const Center(child: Text('page3')),
-    const Center(child: Text('page4')),
-    const Center(child: Text('page5')),
-  ];
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> screens = [
+      EditEmail(isEditProfile: true, userDataModel: userData),
+      EditEmail(isEditProfile: false, userDataModel: userData),
+      const ChangePassword(isChangePassword: true),
+      CoachBilling(coachBillingModel: _coachBilling),
+      ManageBilling(manageBillingModel: _manageBilling),
+    ];
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -179,7 +265,13 @@ class _SettingScreenState extends State<SettingScreen> {
                 ],
               ),
             ),
-            Expanded(flex: 5, child: screens[selectedIndex]),
+            Expanded(
+                flex: 5,
+                child: isLoading == false
+                    ? screens[selectedIndex]
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      )),
           ],
         ),
       ),
