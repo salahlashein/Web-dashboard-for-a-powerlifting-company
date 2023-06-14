@@ -9,6 +9,171 @@ import 'athleteoverview.dart';
 import 'chatPage.dart';
 import 'exercise.dart';
 
+class ProgramEntryPage extends StatefulWidget {
+  final String coachId;
+
+  const ProgramEntryPage({required this.coachId});
+
+  @override
+  _ProgramEntryPageState createState() => _ProgramEntryPageState();
+}
+
+class _ProgramEntryPageState extends State<ProgramEntryPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _blockController = TextEditingController();
+  final TextEditingController _daysController = TextEditingController();
+  final TextEditingController _workoutsController = TextEditingController();
+  final TextEditingController _setsController = TextEditingController();
+  final TextEditingController _intensityController = TextEditingController();
+
+  void _createProgram() {
+    if (_formKey.currentState!.validate()) {
+      String block = _blockController.text;
+      String days = _daysController.text;
+      String workouts = _workoutsController.text;
+      String sets = _setsController.text;
+      String intensity = _intensityController.text;
+
+      FirebaseFirestore.instance
+          .collection('Coaches')
+          .doc(widget.coachId)
+          .collection('Programs')
+          .add({
+        'block': block,
+        'days': days,
+        'workouts': workouts,
+        'sets': sets,
+        'intensity': intensity,
+      }).then((value) {
+        _blockController.clear();
+        _daysController.clear();
+        _workoutsController.clear();
+        _setsController.clear();
+        _intensityController.clear();
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Program Created'),
+              content: Text('The program has been created successfully.'),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }).catchError((error) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('An error occurred while creating the program.'),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Program Entry'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _blockController,
+                decoration: InputDecoration(labelText: 'Block'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the block name';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _daysController,
+                decoration: InputDecoration(labelText: 'Days'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the number of days';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _workoutsController,
+                decoration: InputDecoration(labelText: 'Workouts'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the number of workouts';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _setsController,
+                decoration: InputDecoration(labelText: 'Sets'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the number of sets';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _intensityController,
+                decoration: InputDecoration(labelText: 'Intensity'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the intensity';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          child: Text('Create Program'),
+          onPressed: _createProgram,
+        ),
+      ],
+    );
+  }
+}
+
 class Navbar extends StatefulWidget {
   @override
   _NavbarState createState() => _NavbarState();
@@ -17,10 +182,11 @@ class Navbar extends StatefulWidget {
 class _NavbarState extends State<Navbar> {
   int _selectedIndex = 0;
   String _coachName = '';
+  String _coachID = '';
 
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
-    Text('Templates Page', style: TextStyle(color: Colors.white)),
+    ProgramEntryPage(coachId: ''), // Replace empty string with actual coach ID
     HomePage(),
     Text('Athlete List Page', style: TextStyle(color: Colors.white)),
     chatPage(),
@@ -46,6 +212,8 @@ class _NavbarState extends State<Navbar> {
         String coachName = await UserService().getCoachName(coachId);
         setState(() {
           _coachName = coachName;
+          _coachID = coachId;
+          _widgetOptions[1] = ProgramEntryPage(coachId: _coachID);
         });
       }
     } catch (e) {
@@ -59,9 +227,7 @@ class _NavbarState extends State<Navbar> {
       builder: (BuildContext context) {
         String athleteEmail = '';
         return Dialog(
-          insetPadding: EdgeInsets.symmetric(
-            horizontal: 16.0,
-          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 16.0),
           backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -127,7 +293,6 @@ class _NavbarState extends State<Navbar> {
         'randomCode': code,
       });
 
-      // Show dialog with the generated code
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -150,7 +315,6 @@ class _NavbarState extends State<Navbar> {
                     IconButton(
                       icon: Icon(Icons.copy),
                       onPressed: () {
-                        // Copy the code to the clipboard
                         Clipboard.setData(ClipboardData(text: code));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -220,9 +384,7 @@ class _NavbarState extends State<Navbar> {
             SizedBox(width: 10),
             IconButton(
               icon: Icon(Icons.notifications),
-              onPressed: () {
-                // Add your action for notification icon here
-              },
+              onPressed: () {},
             ),
             SizedBox(width: 10),
             CircleAvatar(
@@ -326,4 +488,24 @@ class _NavbarState extends State<Navbar> {
       ),
     );
   }
+}
+
+class App extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Your App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Navbar(),
+      },
+    );
+  }
+}
+
+void main() {
+  runApp(App());
 }
