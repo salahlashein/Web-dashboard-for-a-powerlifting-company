@@ -44,6 +44,7 @@ class AuthService {
           'firstName': firstName,
           'lastName': lastName,
           'email': email,
+          'imagePath': null,
         });
       }
     } catch (e) {
