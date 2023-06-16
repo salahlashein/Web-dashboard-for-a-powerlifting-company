@@ -17,13 +17,14 @@ class _AddProgramWidgetState extends State<AddProgramWidget> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _coachIdController = TextEditingController();
   final TextEditingController _athleteIdController = TextEditingController();
-  
-   @override
+  final TextEditingController _programIdController = TextEditingController();
+
+  @override
   void initState() {
     super.initState();
     _loadCoachName();
   }
-  
+
   Future<void> _loadCoachName() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -45,6 +46,7 @@ class _AddProgramWidgetState extends State<AddProgramWidget> {
     _nameController.dispose();
     _coachIdController.dispose();
     _athleteIdController.dispose();
+    _programIdController.dispose();
     super.dispose();
   }
 
@@ -52,15 +54,16 @@ class _AddProgramWidgetState extends State<AddProgramWidget> {
     String name = _nameController.text;
     String coachId = _coachIdController.text;
     String athleteId = _athleteIdController.text;
+    String programId = _programIdController.text;
 
     Program newProgram = Program(
-      id: '',
+      id: programId,
       name: name,
       coachId: coachId,
       athleteId: athleteId,
     );
 
-    _programService.addProgram(newProgram);
+    _programService.deleteProgram(newProgram);
     // Handle success or error cases when adding a program
   }
 
@@ -84,6 +87,12 @@ class _AddProgramWidgetState extends State<AddProgramWidget> {
           controller: _athleteIdController,
           decoration: InputDecoration(
             labelText: 'Athlete ID',
+          ),
+        ),
+        TextField(
+          controller: _programIdController,
+          decoration: InputDecoration(
+            labelText: 'program ID',
           ),
         ),
         ElevatedButton(
