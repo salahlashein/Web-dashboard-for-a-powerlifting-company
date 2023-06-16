@@ -55,7 +55,7 @@ class _SignUpState extends State<SignUp> {
 
     try {
       await AuthService()
-          .registerUser(_email, _password, _firstName, _lastName);
+          .registerUser(_email, _password, _firstName, _lastName,);
 
       // Additional steps after successful sign-up
       // e.g., saving user data to database

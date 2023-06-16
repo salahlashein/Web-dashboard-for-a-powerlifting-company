@@ -5,13 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/forget_password.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
+import 'package:web_dashboard/test.dart';
 
 import 'Register.dart';
 import 'login.dart';
 import 'navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +47,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/login',
       routes: {
-        '/login': (context) => const Login(),
+        '/login': (context) => Login(),
         '/SignUp': (context) => const SignUp(),
         '/Navbar': (context) => Navbar(),
         '/details': (context) => const DetailsScreen(),

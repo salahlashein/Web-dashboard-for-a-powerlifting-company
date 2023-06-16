@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/Coach.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Coach? _userFromFirebaseUser(User? user) {
-    return user != null ? Coach(uid: user.uid) : null;
+    return user != null
+        ? Coach(
+            id: user.uid,
+            email: '', // Update this based on how you retrieve email
+            firstName: '', // Update this based on how you retrieve firstName
+            lastName: '', // Update this based on how you retrieve lastName
+            imagePath: '', // Update this based on how you retrieve imagePath
+          )
+        : null;
   }
 
   Stream<Coach?> get firebaseUser {
@@ -44,7 +51,6 @@ class AuthService {
           'firstName': firstName,
           'lastName': lastName,
           'email': email,
-          'imagePath': null,
         });
       }
     } catch (e) {
