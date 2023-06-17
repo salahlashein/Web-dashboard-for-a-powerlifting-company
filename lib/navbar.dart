@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:web_dashboard/athleatesList.dart';
 import 'package:web_dashboard/services/userservice.dart';
 import 'package:web_dashboard/test.dart';
 
@@ -25,7 +26,7 @@ class _NavbarState extends State<Navbar> {
     exercise(),
     MyScreen(),
     HomePage(),
-    Text('Athlete List Page', style: TextStyle(color: Colors.white)),
+    AthletesGrid(),
     chatPage(),
   ];
 

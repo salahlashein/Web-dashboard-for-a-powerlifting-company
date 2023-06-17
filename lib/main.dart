@@ -10,6 +10,7 @@ import 'package:web_dashboard/setting_screen/setting.dart';
 import 'package:web_dashboard/test.dart';
 
 import 'Register.dart';
+import 'athleatesList.dart';
 import 'login.dart';
 import 'navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => AthleteHoverNotifier()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -68,6 +70,7 @@ class MyApp extends StatelessWidget {
           '/details': (context) => const DetailsScreen(),
           '/settings': (context) => const SettingScreen(),
           '/forgetpass': (context) => const ForgetPassword(),
+          '/AthletesGrid': (context) => AthletesGrid(),
         },
       ),
     );
