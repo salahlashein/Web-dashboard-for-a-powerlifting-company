@@ -1,119 +1,205 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:web_dashboard/services/program_service.dart';
-import 'package:web_dashboard/services/userservice.dart';
+import 'package:provider/provider.dart';
 
-import 'models/Program.dart';
+import 'models/exercise.dart';
 
-class AddProgramWidget extends StatefulWidget {
-  @override
-  _AddProgramWidgetState createState() => _AddProgramWidgetState();
-}
-
-class _AddProgramWidgetState extends State<AddProgramWidget> {
-  String _coachName = '';
-  String _coachID = '';
-  final ProgramService _programService = ProgramService();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _coachIdController = TextEditingController();
-  final TextEditingController _athleteIdController = TextEditingController();
-  final TextEditingController _programIdController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCoachName();
-  }
-
-  Future<void> _loadCoachName() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String coachId = user.uid;
-        String coachName = await UserService().getCoachName(coachId);
-        setState(() {
-          _coachName = coachName;
-          _coachID = coachId;
-        });
-      }
-    } catch (e) {
-      print('Error loading coach name: ${e.toString()}');
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _coachIdController.dispose();
-    _athleteIdController.dispose();
-    _programIdController.dispose();
-    super.dispose();
-  }
-
-  void _addProgram() {
-    String name = _nameController.text;
-    String coachId = _coachIdController.text;
-    String athleteId = _athleteIdController.text;
-    String programId = _programIdController.text;
-
-    Program newProgram = Program(
-      id: programId,
-      name: name,
-      coachId: coachId,
-      athleteId: athleteId,
-    );
-
-    _programService.deleteProgram(newProgram);
-    // Handle success or error cases when adding a program
-  }
-
+class ProgramScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _nameController,
-          decoration: InputDecoration(
-            labelText: 'Program Name',
-          ),
-        ),
-        TextField(
-          controller: _coachIdController,
-          decoration: InputDecoration(
-            labelText: 'Coach ID',
-          ),
-        ),
-        TextField(
-          controller: _athleteIdController,
-          decoration: InputDecoration(
-            labelText: 'Athlete ID',
-          ),
-        ),
-        TextField(
-          controller: _programIdController,
-          decoration: InputDecoration(
-            labelText: 'program ID',
-          ),
-        ),
-        ElevatedButton(
-          onPressed: _addProgram,
-          child: Text('Add Program'),
-        ),
-      ],
-    );
-  }
-}
+    return Consumer<ExerciseProvider>(
+      builder: (ctx, exerciseProvider, _) => Scaffold(
+        
+        body: ListView.builder(
+        
+          itemCount: exerciseProvider.blocks.length,
+          itemBuilder: (ctx, index) => BlockCard(blockIndex: index),
 
-class _coachName {}
-
-class MyScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Program'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.red,
+          onPressed: exerciseProvider.addBlock,
+          child: Icon(
+            Icons.add,
+          ),
+          tooltip: 'Add block',
+        ),
+  
       ),
-      body: AddProgramWidget(),
+    );
+  }
+}
+
+class BlockCard extends StatelessWidget {
+  final int blockIndex;
+
+  BlockCard({required this.blockIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ExerciseProvider>(
+      builder: (ctx, exerciseProvider, _) {
+        var block = exerciseProvider.blocks[blockIndex];
+        return Card(
+          color: Colors.yellow,
+          child: Column(
+            children: [
+              Text('Block'),
+
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                ),
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: block.days.length,
+                itemBuilder: (ctx, index) =>
+                    DayCard(blockIndex: blockIndex, dayIndex: index),
+              ),
+              ElevatedButton(
+                onPressed: () => exerciseProvider.addDay(blockIndex),
+                child: Text('Add Day'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DayCard extends StatelessWidget {
+  final int blockIndex;
+  final int dayIndex;
+
+  DayCard({required this.blockIndex, required this.dayIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ExerciseProvider>(
+      builder: (ctx, exerciseProvider, _) {
+        var day = exerciseProvider.blocks[blockIndex].days[dayIndex];
+        return Card(
+          color: Colors.green,
+          child: Column(
+            children: [
+              Text('Day ${dayIndex + 1}'),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: day.workouts.length,
+                itemBuilder: (ctx, index) => WorkoutCard(
+                    blockIndex: blockIndex,
+                    dayIndex: dayIndex,
+                    workoutIndex: index),
+              ),
+              ElevatedButton(
+                onPressed: () => exerciseProvider.addWorkout(
+                  blockIndex,
+                  dayIndex,
+                ),
+                child: Text('Add Workout'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class WorkoutCard extends StatelessWidget {
+  final int blockIndex;
+  final int dayIndex;
+  final int workoutIndex;
+
+  WorkoutCard(
+      {required this.blockIndex,
+      required this.dayIndex,
+      required this.workoutIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ExerciseProvider>(
+      builder: (ctx, exerciseProvider, _) {
+        var workout = exerciseProvider
+            .blocks[blockIndex].days[dayIndex].workouts[workoutIndex];
+        return Card(
+          color: Colors.blue,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'workout name',
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: workout.sets.length,
+                itemBuilder: (ctx, index) => SetCard(
+                    blockIndex: blockIndex,
+                    dayIndex: dayIndex,
+                    workoutIndex: workoutIndex,
+                    setIndex: index),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    exerciseProvider.addSet(blockIndex, dayIndex, workoutIndex),
+                child: Text('Add Set'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SetCard extends StatelessWidget {
+  final int blockIndex;
+  final int dayIndex;
+  final int workoutIndex;
+  final int setIndex;
+
+  SetCard(
+      {required this.blockIndex,
+      required this.dayIndex,
+      required this.workoutIndex,
+      required this.setIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ExerciseProvider>(
+      builder: (ctx, exerciseProvider, _) {
+        var set = exerciseProvider.blocks[blockIndex].days[dayIndex]
+            .workouts[workoutIndex].sets[setIndex];
+        return Card(
+          color: Colors.red,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Reps',
+                ),
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Intensity',
+                ),
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Notes',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -24,7 +24,7 @@ class BlockService {
 
   Future<void> updateBlock(Block block) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('workout');
+        FirebaseFirestore.instance.collection('block');
 
     // Convert the program to a JSON object
     Map<String, dynamic> programData = block.toJson();
@@ -41,7 +41,7 @@ class BlockService {
 
   Future<void> deleteBlock(Block block) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('workout');
+        FirebaseFirestore.instance.collection('block');
 
     return collection
         .doc(block.id) // Get the document with the provided id

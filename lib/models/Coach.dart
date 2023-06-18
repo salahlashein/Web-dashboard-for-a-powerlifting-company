@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Coach {
   final String id;
   final String email;
@@ -34,5 +36,22 @@ class Coach {
       lastName: json['lastName'],
       imagePath: json['imagePath'],
     );
+  }
+}
+
+class CoachProvider with ChangeNotifier {
+  Coach _coach = Coach(
+    id: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    imagePath: '',
+  );
+
+  Coach get coach => _coach;
+
+  void setCoach(Coach coach) {
+    _coach = coach;
+    notifyListeners();
   }
 }

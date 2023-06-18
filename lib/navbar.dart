@@ -11,7 +11,6 @@ import 'athleteoverview.dart';
 import 'chatPage.dart';
 import 'exercise.dart';
 
-
 class Navbar extends StatefulWidget {
   @override
   _NavbarState createState() => _NavbarState();
@@ -24,7 +23,7 @@ class _NavbarState extends State<Navbar> {
 
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
-    MyScreen(),
+    ProgramScreen(),
     HomePage(),
     AthletesGrid(),
     chatPage(),
@@ -51,7 +50,6 @@ class _NavbarState extends State<Navbar> {
         setState(() {
           _coachName = coachName;
           _coachID = coachId;
-          _widgetOptions[1] = MyScreen();
         });
       }
     } catch (e) {
@@ -102,7 +100,7 @@ class _NavbarState extends State<Navbar> {
                 SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    _createAthleteAccount(athleteEmail);
+                    _createAthleteAccount(athleteEmail, _coachID);
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 9, 181, 152),
@@ -121,7 +119,8 @@ class _NavbarState extends State<Navbar> {
     );
   }
 
-  Future<void> _createAthleteAccount(String athleteEmail) async {
+  Future<void> _createAthleteAccount(
+      String athleteEmail, String coachId) async {
     try {
       final String code = _generateRandomCode();
       await FirebaseFirestore.instance
@@ -129,6 +128,7 @@ class _NavbarState extends State<Navbar> {
           .doc(athleteEmail)
           .set({
         'randomCode': code,
+        'coachId': coachId,
       });
 
       showDialog(

@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:web_dashboard/models/userdata.dart';
+
+import '../models/Athlete.dart';
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,6 +22,21 @@ class UserService {
       print('Error retrieving coach name: ${e.toString()}');
       return '';
     }
+  }
+
+//salah function that get all the athleates with id of the coach
+
+  Stream<List<Athlete>> getAthletes(String? coachId) {
+    final athletesCollection =
+        FirebaseFirestore.instance.collection('Athletes');
+    final query = athletesCollection.where('coachId', isEqualTo: coachId);
+
+    return query.snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return Athlete.fromJson(data);
+      }).toList();
+    });
   }
 
   Future<List<CoachBillingModel>> getCoachCoachBilling(String coachId) async {

@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:web_dashboard/models/Workout.dart';
+import 'package:web_dashboard/models/block.dart';
+
 class Exercise {
   final String id;
   final String name;
@@ -35,4 +39,48 @@ class Exercise {
       videoLink: json['videoLink'],
     );
   }
+}
+class Block {
+  List<Day> days = [];
+}
+
+class Day {
+  List<Workout> workouts = [];
+}
+
+class Workout {
+  List<Set> sets = [];
+
+}
+
+class Set {
+  // Whatever properties a set has
+}
+
+class ExerciseProvider with ChangeNotifier {
+  List<Block> _blocks = [];
+
+  List<Block> get blocks => _blocks;
+
+  void addBlock() {
+    _blocks.add(Block());
+    notifyListeners();
+  }
+
+  void addDay(int blockIndex) {
+    _blocks[blockIndex].days.add(Day());
+    notifyListeners();
+  }
+
+  void addWorkout(int blockIndex, int dayIndex) {
+    _blocks[blockIndex].days[dayIndex].workouts.add(Workout());
+    notifyListeners();
+  }
+
+  void addSet(int blockIndex, int dayIndex, int workoutIndex) {
+    _blocks[blockIndex].days[dayIndex].workouts[workoutIndex].sets.add(Set());
+    notifyListeners();
+  }
+
+
 }

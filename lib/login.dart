@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/services/auth.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,6 +37,8 @@ class _LoginState extends State<Login> {
         _password,
       );
       if (user != null) {
+  Provider.of<CoachProvider>(context, listen: false).setCoach(user);
+
         Navigator.pushNamed(context, '/Navbar');
         print("Login successful");
       }

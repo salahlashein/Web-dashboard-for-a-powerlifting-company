@@ -6,7 +6,7 @@ class DayService {
 
   Future<void> addDay(Day day) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('Day');
+        FirebaseFirestore.instance.collection('day');
 
     // Generate a new document reference with a unique ID, but don't put it in Firestore yet
     DocumentReference documentReference = collection.doc();
@@ -26,7 +26,7 @@ class DayService {
 
   Future<void> updateDay(Day day) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('workout');
+        FirebaseFirestore.instance.collection('day');
 
     // Convert the program to a JSON object
     Map<String, dynamic> programData = day.toJson();

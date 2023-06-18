@@ -13,6 +13,9 @@ class UserDataModel {
   Map<String, dynamic> toMap() {
     return {'firstName': firstName, 'lastName': lastName, 'email': email};
   }
+
+  
+
 }
 
 class CoachBillingModel {

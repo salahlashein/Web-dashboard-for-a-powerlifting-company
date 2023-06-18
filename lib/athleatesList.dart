@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:web_dashboard/models/Athlete.dart';
+import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/services/userservice.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -49,10 +53,37 @@ class AthletesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 6, // Limit the maximum number of cards in a row to 6
-      children:
-          athletes.map((athlete) => AthleteCard(athleteName: athlete)).toList(),
+    UserService userService = UserService(); // Make sure it's instantiated
+    final coachProvider = Provider.of<CoachProvider>(context);
+    final coach = coachProvider.coach;
+
+    return StreamBuilder<List<Athlete>>(
+      
+        stream: userService.getAthletes(coach.id),
+        builder: (context, snapshot) {
+          
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show loading indicator while waiting for the data
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Show error message if something went wrong
+            print('Stream error: ${snapshot.error}'); // Debugging print
+            return Text('Error: ${snapshot.error}');
+          } else {
+            // Build the grid of athlete cards
+            List<Athlete> athletes = snapshot.data ?? [];
+            print('Athletes received: $athletes'); // Debugging print
+            return GridView.count(
+              crossAxisCount:
+                  6, // Limit the maximum number of cards in a row to 6
+              children: athletes
+                  .map((athlete) => AthleteCard(athleteName: athlete.firstName))
+                  .toList(),
+      );
+        }
+      },
+      // Disable caching by setting maintainState to false
+
     );
   }
 }
@@ -109,15 +140,15 @@ class _AthleteCardState extends State<AthleteCard> {
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: Icon(Icons.message),
+                      icon: Icon(Icons.library_books_sharp),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: Icon(Icons.restaurant_menu_outlined),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: Icon(Icons.bar_chart),
                       onPressed: () {},
                     ),
                   ],

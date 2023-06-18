@@ -4,7 +4,7 @@ import 'package:web_dashboard/models/Workout.dart';
 class WorkoutService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> addDay(Workout workout) async {
+  Future<void> addWorkout(Workout workout) async {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('Workout');
 
@@ -24,22 +24,23 @@ class WorkoutService {
     });
   }
 
-  Future<void> updateWorkout( Workout workout) async {
-  CollectionReference collection = FirebaseFirestore.instance.collection('workout');
+  Future<void> updateWorkout(Workout workout) async {
+    CollectionReference collection =
+        FirebaseFirestore.instance.collection('workout');
 
-  // Convert the program to a JSON object
-  Map<String, dynamic> programData = workout.toJson();
+    // Convert the program to a JSON object
+    Map<String, dynamic> programData = workout.toJson();
 
-  return collection
-      .doc(workout.id) // Get the document with the provided id
-      .update(programData) // Update the document with the new data
-      .then((_) {
-        print('Document updated with ID: ${workout.id}');
-      })
-      .catchError((e) {
-        print('Error updating document: $e');
-      });
-}
+    return collection
+        .doc(workout.id) // Get the document with the provided id
+        .update(programData) // Update the document with the new data
+        .then((_) {
+      print('Document updated with ID: ${workout.id}');
+    }).catchError((e) {
+      print('Error updating document: $e');
+    });
+  }
+
   Future<void> deleteWorkout(Workout workout) async {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('workout');
@@ -53,5 +54,4 @@ class WorkoutService {
       print('Error deleting document: $e');
     });
   }
-
 }

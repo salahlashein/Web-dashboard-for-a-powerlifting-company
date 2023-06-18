@@ -11,7 +11,7 @@ class Athlete {
   final List<String> weights;
 
   Athlete({
-        required this.id,
+    required this.id,
     required this.firstName,
     required this.lastName,
     required this.imagePath,
@@ -26,7 +26,7 @@ class Athlete {
   // Convert an Athlete into a JSON string
   Map<String, dynamic> toJson() {
     return {
-            'id': id,
+      'id': id,
       'firstName': firstName,
       'lastName': lastName,
       'imagePath': imagePath,
@@ -42,16 +42,17 @@ class Athlete {
   // Convert a JSON string into an Athlete
   factory Athlete.fromJson(Map<String, dynamic> json) {
     return Athlete(
-            id: json['id'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      imagePath: json['imagePath'],
-      squat: json['squat'],
-      bench: json['bench'],
-      deadlift: json['deadlift'],
-      email: json['email'],
-      images: List<String>.from(json['images']),
-      weights: List<String>.from(json['weights'].map((x) => x.toDouble())),
+      id: json['id'] ?? '',
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
+      imagePath: json['imagePath'] ?? '',
+      squat: json['squat'] ?? 0.0,
+      bench: json['bench'] ?? 0.0,
+      deadlift: json['deadlift'] ?? 0.0,
+      email: json['email'] ?? '',
+      images: List<String>.from(json['images'] ?? []),
+      weights:
+          List<String>.from((json['weights'] ?? []).map((x) => x.toDouble())),
     );
   }
 }

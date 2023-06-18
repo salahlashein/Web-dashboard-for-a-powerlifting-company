@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/forget_password.dart';
+import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/models/exercise.dart';
 import 'package:web_dashboard/services/auth.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
 import 'package:web_dashboard/test.dart';
@@ -26,6 +28,7 @@ void main() async {
           messagingSenderId: "31142014468",
           appId: "1:31142014468:web:a3b9abc778bf36c47a8f51"));
 
+  var userService;
   runApp(
     MultiProvider(
       providers: [
@@ -44,9 +47,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
+      
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => AthleteHoverNotifier()),
+        ChangeNotifierProvider(create: (_) => CoachProvider()),
+        ChangeNotifierProvider(create: (_) => ExerciseProvider()),
+        
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -70,7 +77,7 @@ class MyApp extends StatelessWidget {
           '/details': (context) => const DetailsScreen(),
           '/settings': (context) => const SettingScreen(),
           '/forgetpass': (context) => const ForgetPassword(),
-          '/AthletesGrid': (context) => AthletesGrid(),
+          '/athleatesList': (context) => AthletesGrid(),
         },
       ),
     );
