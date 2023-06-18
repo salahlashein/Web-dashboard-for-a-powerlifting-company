@@ -5,6 +5,7 @@ import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/services/userservice.dart';
+import 'profile.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -137,7 +138,14 @@ class _AthleteCardState extends State<AthleteCard> {
                   children: <Widget>[
                     IconButton(
                       icon: Icon(Icons.person),
-                      onPressed: () {},
+                       onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(),
+              ),
+            );
+          },
                     ),
                     IconButton(
                       icon: Icon(Icons.library_books_sharp),
