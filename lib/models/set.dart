@@ -6,6 +6,7 @@ class Sets {
   final String coachId;
   final String athleteId;
   final String workoutId;
+  final String exerciseId;
   final int reps;
   final double intensity;
   final double load;
@@ -21,7 +22,8 @@ class Sets {
     required this.programId,
     required this.coachId,
     required this.athleteId,
-   required this.workoutId,
+    required this.workoutId,
+    required this.exerciseId,
     required this.reps,
     required this.intensity,
     required this.load,
@@ -40,6 +42,7 @@ class Sets {
       'coachId': coachId,
       'athleteId': athleteId,
       'workoutId': workoutId,
+      'exerciseId': exerciseId,
       'reps': reps,
       'intensity': intensity,
       'load': load,
@@ -59,6 +62,7 @@ class Sets {
       coachId: json['coachId'],
       athleteId: json['athleteId'],
       workoutId: json['workoutId'],
+      exerciseId: json['exerciseId'],
       reps: json['reps'],
       intensity: (json['intensity'] as num).toDouble(),
       load: (json['load'] as num).toDouble(),

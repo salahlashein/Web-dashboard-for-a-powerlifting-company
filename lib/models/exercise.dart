@@ -40,6 +40,7 @@ class Exercise {
     );
   }
 }
+
 class Block {
   List<Day> days = [];
 }
@@ -50,7 +51,6 @@ class Day {
 
 class Workout {
   List<Set> sets = [];
-
 }
 
 class Set {
@@ -58,7 +58,20 @@ class Set {
 }
 
 class ExerciseProvider with ChangeNotifier {
+  String _coachId = ''; // Initialize with an empty string
   List<Block> _blocks = [];
+  List<Set> sets = [];
+  String _currentWorkout = '';
+ 
+  String get coachId => _coachId; // Define the coachId getter
+ // Initialize with an empty string
+
+  String get currentWorkout => _currentWorkout;
+
+  void updateWorkout(String workout) {
+    _currentWorkout = workout;
+    notifyListeners();
+  }
 
   List<Block> get blocks => _blocks;
 
@@ -78,9 +91,14 @@ class ExerciseProvider with ChangeNotifier {
   }
 
   void addSet(int blockIndex, int dayIndex, int workoutIndex) {
-    _blocks[blockIndex].days[dayIndex].workouts[workoutIndex].sets.add(Set());
+    final newSet = Set(); // Create a new Set object
+
+    // Add the newSet to the corresponding block, day, and workout based on the provided indices
+    final block = blocks[blockIndex];
+    final day = block.days[dayIndex];
+    final workout = day.workouts[workoutIndex];
+    workout.sets.add(newSet);
+
     notifyListeners();
   }
-
-
 }
