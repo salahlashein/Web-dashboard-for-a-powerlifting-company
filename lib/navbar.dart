@@ -23,7 +23,7 @@ class _NavbarState extends State<Navbar> {
     Text('Templates Page', style: TextStyle(color: Colors.white)),
     HomePage(),
     Text('Athlete List Page', style: TextStyle(color: Colors.white)),
-    chatPage(),
+    // chatPage(),
   ];
 
   void _onItemTapped(int index) {
