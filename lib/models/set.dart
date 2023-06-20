@@ -1,21 +1,21 @@
-class Sets {
-  final String id;
-  final String dayId;
-  final String blockId;
-  final String programId;
-  final String coachId;
-  final String athleteId;
-  final String workoutId;
-  final String exerciseId;
-  final int reps;
-  final double intensity;
-  final double load;
-  final double RPE;
-  final bool done;
-  final String link;
-  final String notes;
+class setExersice {
+  String id;
+  String dayId;
+  String blockId;
+  String programId;
+  String coachId;
+  String athleteId;
+  String workoutId;
+  String exerciseId;
+  String reps;
+  String intensity;
+  String load;
+  String RPE;
+  bool done;
+  String link;
+  String notes;
 
-  Sets({
+  setExersice({
     required this.id,
     required this.dayId,
     required this.blockId,
@@ -53,8 +53,8 @@ class Sets {
     };
   }
 
-  factory Sets.fromJson(Map<String, dynamic> json) {
-    return Sets(
+  factory setExersice.fromJson(Map<String, dynamic> json) {
+    return setExersice(
       id: json['id'],
       dayId: json['dayId'],
       blockId: json['blockId'],
@@ -64,9 +64,9 @@ class Sets {
       workoutId: json['workoutId'],
       exerciseId: json['exerciseId'],
       reps: json['reps'],
-      intensity: (json['intensity'] as num).toDouble(),
-      load: (json['load'] as num).toDouble(),
-      RPE: (json['RPE'] as num).toDouble(),
+      intensity: json['intensity'],
+      RPE: json['RPE'],
+      load: json['load'],
       done: json['done'],
       link: json['link'],
       notes: json['notes'],

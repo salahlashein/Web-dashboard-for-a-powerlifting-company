@@ -54,4 +54,8 @@ class CoachProvider with ChangeNotifier {
     _coach = coach;
     notifyListeners();
   }
+
+  Coach getcoach() {
+    return _coach;
+  }
 }

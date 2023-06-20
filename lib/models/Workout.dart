@@ -1,20 +1,22 @@
 class Workout {
-  final String id;
-  final String dayId;
-  final String blockId;
-  final String programId;
-  final String coachId;
-  final String athleteId;
-  final String exerciseId;
+  final String? id;
+  final String? dayId;
+  final String? blockId;
+  final String? programId;
+  final String? coachId;
+  final String? athleteId;
+  final String? exerciseId;
+  List<Set> sets = [];
+  String selectedExercise = '';
 
   Workout({
-    required this.id,
-    required this.dayId,
-    required this.blockId,
-    required this.programId,
-    required this.coachId,
-    required this.athleteId,
-    required this.exerciseId,
+    this.id,
+    this.dayId,
+    this.blockId,
+    this.programId,
+    this.coachId,
+    this.athleteId,
+    this.exerciseId,
   });
 
   Map<String, dynamic> toJson() {
@@ -31,13 +33,13 @@ class Workout {
 
   factory Workout.fromJson(Map<String, dynamic> json) {
     return Workout(
-      id: json['id'],
-      dayId: json['dayId'],
-      blockId: json['blockId'],
-      programId: json['programId'],
-      coachId: json['coachId'],
-      athleteId: json['athleteId'],
-      exerciseId: json['exerciseId'],
+      id: json['id'] ?? '',
+      dayId: json['dayId'] ?? '',
+      blockId: json['blockId'] ?? '',
+      programId: json['programId'] ?? '',
+      coachId: json['coachId'] ?? '',
+      athleteId: json['athleteId'] ?? '',
+      exerciseId: json['exerciseId'] ?? '',
     );
   }
 }

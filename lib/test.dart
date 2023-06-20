@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_dashboard/exercise.dart';
 import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/models/set.dart';
 import 'package:web_dashboard/services/exercise_service.dart';
 import 'package:web_dashboard/services/userservice.dart';
 
@@ -9,20 +11,18 @@ import 'models/exercise.dart';
 class ProgramScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<ExerciseProvider>(
-      builder: (ctx, exerciseProvider, _) => Scaffold(
-        body: ListView.builder(
+    return Scaffold(
+      body: Consumer<ExerciseProvider>(
+        builder: (context, exerciseProvider, _) => ListView.builder(
           itemCount: exerciseProvider.blocks.length,
           itemBuilder: (ctx, index) => BlockCard(blockIndex: index),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.red,
-          onPressed: exerciseProvider.addBlock,
-          child: Icon(
-            Icons.add,
-          ),
-          tooltip: 'Add block',
-        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: context.read<ExerciseProvider>().addBlock,
+        child: Icon(Icons.add),
+        tooltip: 'Add block',
       ),
     );
   }
@@ -35,11 +35,6 @@ class BlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exerciseProvider = Provider.of<ExerciseProvider>(context);
-    UserService userService = UserService(); // Make sure it's instantiated
-    final coachProvider = Provider.of<CoachProvider>(context);
-    final coach = coachProvider.coach;
-
     return Consumer<ExerciseProvider>(
       builder: (ctx, exerciseProvider, _) {
         var block = exerciseProvider.blocks[blockIndex];
@@ -48,16 +43,8 @@ class BlockCard extends StatelessWidget {
           child: Column(
             children: [
               Text('Block'),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                ),
-              ),
+              buildTextFormField('Name'),
+              buildTextFormField('Description'),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: block.days.length,
@@ -65,16 +52,21 @@ class BlockCard extends StatelessWidget {
                     DayCard(blockIndex: blockIndex, dayIndex: index),
               ),
               ElevatedButton(
-                onPressed: () {
-                  exerciseProvider.addDay(blockIndex);
-                  print(coach.id);
-                },
+                onPressed: () => exerciseProvider.addDay(blockIndex),
                 child: Text('Add Day'),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget buildTextFormField(String labelText) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
     );
   }
 }
@@ -88,7 +80,7 @@ class DayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ExerciseProvider>(
-      builder: (ctx, exerciseProvider, _) {
+      builder: (context, exerciseProvider, _) {
         var day = exerciseProvider.blocks[blockIndex].days[dayIndex];
         return Card(
           color: Colors.green,
@@ -104,10 +96,8 @@ class DayCard extends StatelessWidget {
                     workoutIndex: index),
               ),
               ElevatedButton(
-                onPressed: () => exerciseProvider.addWorkout(
-                  blockIndex,
-                  dayIndex,
-                ),
+                onPressed: () =>
+                    exerciseProvider.addWorkout(blockIndex, dayIndex),
                 child: Text('Add Workout'),
               ),
             ],
@@ -118,98 +108,97 @@ class DayCard extends StatelessWidget {
   }
 }
 
+// The WorkoutCard and SetCard widgets should follow the same pattern as DayCard
 class WorkoutCard extends StatelessWidget {
   final int blockIndex;
   final int dayIndex;
   final int workoutIndex;
 
-  WorkoutCard({
-    required this.blockIndex,
-    required this.dayIndex,
-    required this.workoutIndex,
-  });
+  WorkoutCard(
+      {required this.blockIndex,
+      required this.dayIndex,
+      required this.workoutIndex});
 
   @override
   Widget build(BuildContext context) {
-    final exerciseProvider = Provider.of<ExerciseProvider>(context);
-    UserService userService = UserService(); // Make sure it's instantiated
-    final coachProvider = Provider.of<CoachProvider>(context);
-    final coach = coachProvider.coach;
-
     return Consumer<ExerciseProvider>(
-      builder: (ctx, exerciseProvider, _) => Card(
-        color: Colors.blue,
-        child: Column(
-          children: [
-            FutureBuilder<List<Exercise>>(
-              future: Exercise_service().getExercisesForCoach(coach.id),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  List<Exercise> exercises = snapshot.data ?? [];
-
-                  return DropdownButton<String>(
-                    value: exerciseProvider.currentWorkout,
-                    items: exercises.map<DropdownMenuItem<String>>((exercise) {
-                      return DropdownMenuItem<String>(
-                        value: exercise.name,
-                        child: Text(exercise.name),
-                      );
-                    }).toList(),
-                    onChanged: (value) =>
-                        exerciseProvider.updateWorkout(value!),
+      builder: (context, exerciseProvider, _) {
+        var workout = exerciseProvider
+            .blocks[blockIndex].days[dayIndex].workouts[workoutIndex];
+        return Card(
+          color: Colors.blue,
+          child: Column(
+            children: [
+              DropdownButton<String>(
+                value: workout.selectedExercise,
+                hint: Text('Please choose a workout'),
+                items: exerciseProvider.exercises
+                    .map<DropdownMenuItem<String>>((Exercise exercise) {
+                  return DropdownMenuItem<String>(
+                    value: exercise.name,
+                    child: Text(exercise.name),
                   );
-                }
-              },
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: exerciseProvider.sets.length,
-              itemBuilder: (ctx, index) => SetCard(),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                print(coach.id);
-                exerciseProvider.addSet(blockIndex, dayIndex, workoutIndex);
-              },
-              child: Text('Add Set'),
-            ),
-          ],
-        ),
-      ),
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    workout.selectedExercise = newValue;
+                  }
+                },
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: workout.sets.length,
+                itemBuilder: (ctx, index) => SetCard(
+                  set: workout.sets[index] as setExersice,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    exerciseProvider.addSet(blockIndex, dayIndex, workoutIndex),
+                child: Text('Add Set'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
 class SetCard extends StatelessWidget {
+  final setExersice set;
+
+  SetCard({required this.set});
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<ExerciseProvider>(
-      builder: (ctx, exerciseProvider, _) => Card(
-        color: Colors.red,
-        child: Column(
-          children: [
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Reps',
-              ),
-            ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Intensity',
-              ),
-            ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Notes',
-              ),
-            ),
-          ],
-        ),
+    return Card(
+      color: Colors.red,
+      child: Column(
+        children: [
+          buildTextFormField('Reps', set.reps),
+          buildTextFormField('Intensity', set.intensity),
+          buildTextFormField('Notes', set.notes),
+        ],
       ),
+    );
+  }
+
+  Widget buildTextFormField(String labelText, String initialValue) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      initialValue: initialValue,
+      onChanged: (value) {
+        if (labelText == 'Reps') {
+          set.reps = value;
+        } else if (labelText == 'Intensity') {
+          set.intensity = value;
+        } else if (labelText == 'Notes') {
+          set.notes = value;
+        }
+      },
     );
   }
 }

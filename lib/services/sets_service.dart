@@ -4,7 +4,7 @@ import 'package:web_dashboard/models/set.dart';
 class SetsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> addSets(Sets sets) async {
+  Future<void> addSets(setExersice sets) async {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('sets');
 
@@ -24,7 +24,7 @@ class SetsService {
     });
   }
 
-  Future<void> UpdateSets( Sets sets) async {
+  Future<void> UpdateSets( setExersice sets) async {
   CollectionReference collection = FirebaseFirestore.instance.collection('sets');
 
   // Convert the program to a JSON object
@@ -40,7 +40,7 @@ class SetsService {
         print('Error updating document: $e');
       });
 }
-  Future<void> deletesets(Sets sets) async {
+  Future<void> deletesets(setExersice sets) async {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('sets');
 

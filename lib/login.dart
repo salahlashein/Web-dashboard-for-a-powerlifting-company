@@ -37,10 +37,11 @@ class _LoginState extends State<Login> {
         _password,
       );
       if (user != null) {
-  Provider.of<CoachProvider>(context, listen: false).setCoach(user);
+        Provider.of<CoachProvider>(context, listen: false).setCoach(user);
 
         Navigator.pushNamed(context, '/Navbar');
         print("Login successful");
+        print(Provider.of<CoachProvider>(context, listen: false).getcoach());
       }
     } catch (e) {
       // Check if error message is provided by Firebase

@@ -24,32 +24,6 @@ class MyApp extends StatelessWidget {
 }
 
 class AthletesGrid extends StatelessWidget {
-  final List<String> athletes = [
-    'Athlete 1',
-    'Athlete 2',
-    'Athlete 3',
-    'Athlete 4',
-    'Athlete 5',
-    'Athlete 6',
-    'Athlete 1',
-    'Athlete 2',
-    'Athlete 3',
-    'Athlete 4',
-    'Athlete 5',
-    'Athlete 6',
-    'Athlete 1',
-    'Athlete 2',
-    'Athlete 3',
-    'Athlete 4',
-    'Athlete 5',
-    'Athlete 6',
-    'Athlete 1',
-    'Athlete 2',
-    'Athlete 3',
-    'Athlete 4',
-    'Athlete 5',
-    'Athlete 6'
-  ];
 
   @override
   Widget build(BuildContext context) {
