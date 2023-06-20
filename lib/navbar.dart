@@ -125,7 +125,7 @@ class _NavbarState extends State<Navbar> {
       final String code = _generateRandomCode();
       await FirebaseFirestore.instance
           .collection('Athletes')
-          .doc(athleteEmail)
+          .doc()
           .set({
         'randomCode': code,
         'coachId': coachId,
