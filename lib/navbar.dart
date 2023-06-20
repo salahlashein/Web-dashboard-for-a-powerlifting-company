@@ -24,7 +24,7 @@ class _NavbarState extends State<Navbar> {
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
     ProgramScreen(),
-    HomePage(),
+    CalendarScreen(),
     AthletesGrid(),
     chatPage(),
   ];
