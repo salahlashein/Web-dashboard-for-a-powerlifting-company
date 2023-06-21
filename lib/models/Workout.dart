@@ -2,13 +2,11 @@ class Workout {
   final String? id;
   final String? dayId;
   final String? exerciseId;
-  List<Set> sets = [];
-  String selectedExercise = '';
 
   Workout({
     this.id,
-    this.dayId,
     this.exerciseId,
+    this.dayId,
   });
 
   Map<String, dynamic> toJson() {
@@ -16,6 +14,7 @@ class Workout {
       'id': id,
       'dayId': dayId,
       'exerciseId': exerciseId,
+      'blockId': dayId,
     };
   }
 

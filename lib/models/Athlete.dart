@@ -3,9 +3,9 @@ class Athlete {
   final String firstName;
   final String lastName;
   final String imagePath;
-  final double squat;
-  final double bench;
-  final double deadlift;
+  final String squat;
+  final String bench;
+  final String deadlift;
   final String email;
   final List<String> images;
   final List<String> weights;
@@ -46,9 +46,9 @@ class Athlete {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       imagePath: json['imagePath'] ?? '',
-      squat: json['squat'] ?? 0.0,
-      bench: json['bench'] ?? 0.0,
-      deadlift: json['deadlift'] ?? 0.0,
+      squat: json['squat'] ?? '',
+      bench: json['bench'] ?? '',
+      deadlift: json['deadlift'] ?? '',
       email: json['email'] ?? '',
       images: List<String>.from(json['images'] ?? []),
       weights:

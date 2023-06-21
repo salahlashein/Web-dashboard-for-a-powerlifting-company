@@ -1,19 +1,13 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:web_dashboard/models/set.dart';
-import 'package:web_dashboard/services/program_service.dart';
-import 'package:web_dashboard/services/sets_service.dart';
 
 import '../models/Day.dart';
 import '../models/Program.dart';
 import '../models/Workout.dart';
 import '../models/block.dart';
-import '../services/block_service.dart';
-import '../services/day_service.dart';
-import '../services/workout_service.dart';
+import '../models/setExersice.dart';
 
 Future<List<Workout>> getWorkout() async {
   try {

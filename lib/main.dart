@@ -6,8 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/forget_password.dart';
 import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/models/createprogrammodels.dart';
 import 'package:web_dashboard/models/exercise.dart';
 import 'package:web_dashboard/services/auth.dart';
+import 'package:web_dashboard/services/exercise_service.dart';
+import 'package:web_dashboard/services/userservice.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
 import 'package:web_dashboard/test.dart';
 
@@ -47,13 +50,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => AthleteHoverNotifier()),
         ChangeNotifierProvider(create: (_) => CoachProvider()),
         ChangeNotifierProvider(create: (_) => ExerciseProvider()),
-        
+        ChangeNotifierProvider(create: (_) => UserService()),
+        Provider(
+          // regular Provider for ExerciseService
+          create: (context) => ExerciseService(),
+        ),
+        FutureProvider(
+          create: (context) => context
+              .read<ExerciseService>()
+              .getExercisesForCoach(
+                  context.read<CoachProvider>().getcoach().id),
+          initialData: [],
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

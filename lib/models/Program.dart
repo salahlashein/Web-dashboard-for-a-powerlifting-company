@@ -24,10 +24,14 @@ class Program {
 
   factory Program.fromJson(Map<String, dynamic> json) {
     return Program(
-      id: json['id'],
-      name: json['name'],
-      coachId: json['coachId'],
-      athleteId: json['athleteId'],
+      id: json['id']??
+          '',
+      name: json['name']??
+          '',
+      coachId: json['coachId']??
+          '',
+      athleteId: json['athleteId']??
+          '',
     );
   }
 }
