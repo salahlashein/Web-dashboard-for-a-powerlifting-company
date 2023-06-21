@@ -1,29 +1,67 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter/material.dart';
 import '../models/Coach.dart';
 
-class AuthService {
+class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
 
-  Coach? _userFromFirebaseUser(User? user) {
-    return user != null ? Coach(uid: user.uid) : null;
+  
+
+  String _errorMessage = '';
+
+  String get errorMessage => _errorMessage;
+
+  void setErrorMessage(String message) {
+    _errorMessage = message;
+    notifyListeners();
   }
 
-  Stream<Coach?> get firebaseUser {
+  Coach? _userFromFirebaseUser(User? user) {
+    return user != null
+        ? Coach(
+            id: user.uid,
+            email: user.email ?? '',
+            firstName: '', // Update this based on how you retrieve firstName
+            lastName: '', // Update this based on how you retrieve lastName
+            imagePath: '', // Update this based on how you retrieve imagePath
+          )
+        : null;
+  }
+
+  // Auth change user stream
+  Stream<Coach?> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
   Future signOut() async {
     try {
-      return await _auth.signOut();
+      await _auth.signOut();
+      notifyListeners();
     } catch (e) {
       print(e.toString());
       return null;
     }
   }
 
-  Future<void> registerUser(
+
+  // Sign in with email and password
+  Future<Coach?> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      UserCredential result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      Coach? user = _userFromFirebaseUser(result.user);
+      notifyListeners();
+      return user;
+    } catch (error) {
+      print(error.toString());
+      return null;
+    }
+  }
+
+  Future<Coach?> registerUser(
     String email,
     String password,
     String firstName,

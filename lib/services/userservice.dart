@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_dashboard/models/userdata.dart';
 
+import '../models/Athlete.dart';
+
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late UserDataModel userData;
@@ -22,6 +24,21 @@ class UserService {
       print('Error retrieving coach name: ${e.toString()}');
       return '';
     }
+  }
+
+//salah function that get all the athleates with id of the coach
+
+  Stream<List<Athlete>> getAthletes(String? coachId) {
+    final athletesCollection =
+        FirebaseFirestore.instance.collection('Athletes');
+    final query = athletesCollection.where('coachId', isEqualTo: coachId);
+
+    return query.snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return Athlete.fromJson(data);
+      }).toList();
+    });
   }
 
   Future<List<CoachBillingModel>> getCoachCoachBilling(String coachId) async {
@@ -64,11 +81,15 @@ class UserService {
     required coachId,
     required String firstName,
     required String lastName,
+    required String imageUrl,
     required String email,
   }) async {
     try {
-      UserDataModel model =
-          UserDataModel(firstName: firstName, lastName: lastName, email: email);
+      UserDataModel model = UserDataModel(
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          imagePath: imageUrl);
       await _firestore.collection('Coaches').doc(coachId).update(model.toMap());
     } catch (e) {
       print('Error Update coach name and email: ${e.toString()}');

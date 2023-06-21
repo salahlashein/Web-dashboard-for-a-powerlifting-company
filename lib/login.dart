@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/services/auth.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
@@ -10,11 +14,9 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   var _isObscured = true;
-  final _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
   late String _email;
   late String _password;
-  final _formKey = GlobalKey<FormState>();
-  String _errorMessage = '';
 
   @override
   void initState() {
@@ -22,40 +24,32 @@ class _LoginState extends State<Login> {
     _isObscured = true;
   }
 
-  Future<void> _signIn() async {
+  Future<void> _signIn(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    final authService = Provider.of<AuthService>(context, listen: false);
+
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: _email,
-        password: _password,
+      final user = await authService.signInWithEmailAndPassword(
+        _email,
+        _password,
       );
-      if (userCredential.user != null) {
+      if (user != null) {
+        Provider.of<CoachProvider>(context, listen: false).setCoach(user);
+
         Navigator.pushNamed(context, '/Navbar');
         print("Login successful");
+        print(Provider.of<CoachProvider>(context, listen: false).getcoach());
       }
     } catch (e) {
-      if (e is FirebaseAuthException) {
-        if (e.code == 'user-not-found') {
-          setState(() {
-            _errorMessage =
-                'Invalid email. Please enter a valid email address.';
-          });
-        } else if (e.code == 'wrong-password') {
-          setState(() {
-            _errorMessage =
-                'Invalid password. Please enter the correct password.';
-          });
-        } else {
-          setState(() {
-            _errorMessage = 'An error occurred. Please try again later.';
-          });
-        }
-      } else {
-        print(e);
-      }
+      // Check if error message is provided by Firebase
+      final errorMsg = e is FirebaseAuthException ? e.message : null;
+
+      // Update error message in AuthService
+      authService.setErrorMessage(
+          errorMsg ?? 'An error occurred. Please try again later.');
     }
   }
 
@@ -67,6 +61,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -138,11 +134,10 @@ class _LoginState extends State<Login> {
                                 return null;
                               },
                             ),
-                            SizedBox(height: 5),
+                            SizedBox(height: 20),
                             TextFormField(
+                              keyboardType: TextInputType.text,
                               obscureText: _isObscured,
-                              textInputAction: TextInputAction.done,
-                              keyboardType: TextInputType.visiblePassword,
                               onChanged: (value) {
                                 _password = value;
                               },
@@ -152,26 +147,25 @@ class _LoginState extends State<Login> {
                                   fontSize: 18,
                                   color: Colors.white,
                                 ),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Color(0xff45B39D),
+                                  size: 20,
+                                ),
                                 suffixIcon: IconButton(
-                                  icon: _isObscured
-                                      ? const Icon(
-                                          Icons.visibility,
-                                          color: Color(0xff45B39D),
-                                        )
-                                      : const Icon(
-                                          Icons.visibility_off,
-                                          color: Color(0xff45B39D),
-                                        ),
+                                  icon: Icon(
+                                    _isObscured
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: _isObscured
+                                        ? Colors.white
+                                        : Color(0xff45B39D),
+                                  ),
                                   onPressed: () {
                                     setState(() {
                                       _isObscured = !_isObscured;
                                     });
                                   },
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock,
-                                  color: Color(0xff45B39D),
-                                  size: 20,
                                 ),
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
@@ -182,73 +176,67 @@ class _LoginState extends State<Login> {
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your password';
+                                } else if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
                                 }
                                 return null;
                               },
                             ),
-                            if (_errorMessage.isNotEmpty)
-                              Text(
-                                _errorMessage,
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
                             SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: _signIn,
-                              style: ButtonStyle(
-                                minimumSize:
-                                    MaterialStateProperty.all(Size(380, 40)),
-                                backgroundColor: MaterialStateProperty.all(
-                                    Color(0xff45B39D)),
-                                padding: MaterialStateProperty.all(
-                                    EdgeInsets.all(10)),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                primary: Color(0xff45B39D),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
+                              onPressed: () => _signIn(context),
                               child: Text(
-                                "Login",
-                                style: TextStyle(fontSize: 18),
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 15),
-                            GestureDetector(
-                              onTap: () {
+                            SizedBox(height: 20),
+                            TextButton(
+                              onPressed: () {
                                 Navigator.pushNamed(context, '/forgetpass');
                               },
                               child: Text(
-                                'Forget Password',
-                                style: TextStyle(color: Colors.grey),
+                                'Forgot Password',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 15),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 15),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Not yet a member?',
-                          style: TextStyle(color: Colors.white),
+                    if (authService.errorMessage.isNotEmpty)
+                      Text(
+                        authService.errorMessage,
+                        style: TextStyle(
+                          color: Colors.red,
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/SignUp');
-                          },
-                          child: Text(
-                            '  Sign Up',
-                            style: TextStyle(
-                              color: Color(0xff45B39D),
-                            ),
-                          ),
-                        )
-                      ],
+                      ),
+                    SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/SignUp');
+                      },
+                      child: Text(
+                        'Create Account',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ],
                 ),

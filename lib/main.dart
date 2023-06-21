@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/forget_password.dart';
+import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/models/exercise.dart';
+import 'package:web_dashboard/services/auth.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
+import 'package:web_dashboard/test.dart';
 
 import 'Register.dart';
+import 'athleatesList.dart';
 import 'login.dart';
 import 'navbar.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +28,17 @@ void main() async {
           messagingSenderId: "31142014468",
           appId: "1:31142014468:web:a3b9abc778bf36c47a8f51"));
 
-  runApp(MyApp());
+  var userService;
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthService>(
+          create: (context) => AuthService(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,29 +46,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Coaches Dashboard",
-      theme: ThemeData(
-        iconTheme: IconThemeData(color: Color.fromARGB(255, 255, 255, 255)),
-        scaffoldBackgroundColor: Color.fromARGB(255, 50, 50, 48),
-        textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme)
-            .apply(bodyColor: Colors.white),
-        pageTransitionsTheme: PageTransitionsTheme(builders: {
-          TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder()
-        }),
-        primaryColor: Colors.white,
+    return MultiProvider(
+      
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => AthleteHoverNotifier()),
+        ChangeNotifierProvider(create: (_) => CoachProvider()),
+        ChangeNotifierProvider(create: (_) => ExerciseProvider()),
+        
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Coaches Dashboard",
+        theme: ThemeData(
+          iconTheme: IconThemeData(color: Color.fromARGB(255, 255, 255, 255)),
+          scaffoldBackgroundColor: Color.fromARGB(255, 50, 50, 48),
+          textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme)
+              .apply(bodyColor: Colors.white),
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder()
+          }),
+          primaryColor: Colors.white,
+        ),
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => Login(),
+          '/SignUp': (context) => const SignUp(),
+          '/Navbar': (context) => Navbar(),
+          '/details': (context) => const DetailsScreen(),
+          '/settings': (context) => const SettingScreen(),
+          '/forgetpass': (context) => const ForgetPassword(),
+          '/athleatesList': (context) => AthletesGrid(),
+        },
       ),
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const Login(),
-        '/SignUp': (context) => const SignUp(),
-        '/Navbar': (context) => Navbar(),
-        '/details': (context) => const DetailsScreen(),
-        '/settings': (context) => const SettingScreen(),
-        '/forgetpass': (context) => const ForgetPassword(),
-      },
     );
   }
 }

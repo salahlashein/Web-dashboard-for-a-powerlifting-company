@@ -9,7 +9,7 @@ import 'dart:html' as html;
 
 class EditEmail extends StatefulWidget {
   final bool isEditProfile;
-  final userDataModel;
+  final UserDataModel userDataModel;
   const EditEmail(
       {super.key, required this.isEditProfile, required this.userDataModel});
 
@@ -34,6 +34,7 @@ class _EditEmailState extends State<EditEmail> {
             coachId: user.uid,
             firstName: firstNameController.text,
             lastName: lastNameController.text,
+            imageUrl: widget.userDataModel.imagePath!,
             email: emailController.text);
         setState(() {
           isLoadingUpdate = false;
@@ -61,6 +62,7 @@ class _EditEmailState extends State<EditEmail> {
             coachId: result.user!.uid,
             firstName: firstNameController.text,
             lastName: lastNameController.text,
+            imageUrl: widget.userDataModel.imagePath!,
             email: email);
         setState(() {
           isLoadingUpdate = false;

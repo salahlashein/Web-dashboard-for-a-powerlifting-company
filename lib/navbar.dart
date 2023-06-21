@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:web_dashboard/athleatesList.dart';
 import 'package:web_dashboard/services/userservice.dart';
+import 'package:web_dashboard/test.dart';
 
 import 'athleteoverview.dart';
 import 'chatPage.dart';
@@ -17,13 +19,14 @@ class Navbar extends StatefulWidget {
 class _NavbarState extends State<Navbar> {
   int _selectedIndex = 0;
   String _coachName = '';
+  String _coachID = '';
 
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
-    Text('Templates Page', style: TextStyle(color: Colors.white)),
-    HomePage(),
-    Text('Athlete List Page', style: TextStyle(color: Colors.white)),
-    // chatPage(),
+    ProgramScreen(),
+    CalendarScreen(),
+    AthletesGrid(),
+    chatPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -46,6 +49,7 @@ class _NavbarState extends State<Navbar> {
         String coachName = await UserService().getCoachName(coachId);
         setState(() {
           _coachName = coachName;
+          _coachID = coachId;
         });
       }
     } catch (e) {
@@ -59,9 +63,7 @@ class _NavbarState extends State<Navbar> {
       builder: (BuildContext context) {
         String athleteEmail = '';
         return Dialog(
-          insetPadding: EdgeInsets.symmetric(
-            horizontal: 16.0,
-          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 16.0),
           backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -98,7 +100,7 @@ class _NavbarState extends State<Navbar> {
                 SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    _createAthleteAccount(athleteEmail);
+                    _createAthleteAccount(athleteEmail, _coachID);
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 9, 181, 152),
@@ -117,7 +119,8 @@ class _NavbarState extends State<Navbar> {
     );
   }
 
-  Future<void> _createAthleteAccount(String athleteEmail) async {
+  Future<void> _createAthleteAccount(
+      String athleteEmail, String coachId) async {
     try {
       final String code = _generateRandomCode();
       await FirebaseFirestore.instance
@@ -125,9 +128,9 @@ class _NavbarState extends State<Navbar> {
           .doc(athleteEmail)
           .set({
         'randomCode': code,
+        'coachId': coachId,
       });
 
-      // Show dialog with the generated code
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -150,7 +153,6 @@ class _NavbarState extends State<Navbar> {
                     IconButton(
                       icon: Icon(Icons.copy),
                       onPressed: () {
-                        // Copy the code to the clipboard
                         Clipboard.setData(ClipboardData(text: code));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -220,9 +222,7 @@ class _NavbarState extends State<Navbar> {
             SizedBox(width: 10),
             IconButton(
               icon: Icon(Icons.notifications),
-              onPressed: () {
-                // Add your action for notification icon here
-              },
+              onPressed: () {},
             ),
             SizedBox(width: 10),
             CircleAvatar(
@@ -326,4 +326,24 @@ class _NavbarState extends State<Navbar> {
       ),
     );
   }
+}
+
+class App extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Your App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Navbar(),
+      },
+    );
+  }
+}
+
+void main() {
+  runApp(App());
 }
