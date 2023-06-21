@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
@@ -25,7 +24,6 @@ class MyApp extends StatelessWidget {
 }
 
 class AthletesGrid extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     UserService userService = UserService(); // Make sure it's instantiated
@@ -33,32 +31,29 @@ class AthletesGrid extends StatelessWidget {
     final coach = coachProvider.coach;
 
     return StreamBuilder<List<Athlete>>(
-      
-        stream: userService.getAthletes(coach.id),
-        builder: (context, snapshot) {
-          
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show loading indicator while waiting for the data
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            // Show error message if something went wrong
-            print('Stream error: ${snapshot.error}'); // Debugging print
-            return Text('Error: ${snapshot.error}');
-          } else {
-            // Build the grid of athlete cards
-            List<Athlete> athletes = snapshot.data ?? [];
-            print('Athletes received: $athletes'); // Debugging print
-            return GridView.count(
-              crossAxisCount:
-                  6, // Limit the maximum number of cards in a row to 6
-              children: athletes
-                  .map((athlete) => AthleteCard(athleteName: athlete.firstName))
-                  .toList(),
-      );
+      stream: userService.getAthletes(coach.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show loading indicator while waiting for the data
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Show error message if something went wrong
+          print('Stream error: ${snapshot.error}'); // Debugging print
+          return Text('Error: ${snapshot.error}');
+        } else {
+          // Build the grid of athlete cards
+          List<Athlete> athletes = snapshot.data ?? [];
+          print('Athletes received: $athletes'); // Debugging print
+          return GridView.count(
+            crossAxisCount:
+                6, // Limit the maximum number of cards in a row to 6
+            children: athletes
+                .map((athlete) => AthleteCard(athleteName: athlete.firstName))
+                .toList(),
+          );
         }
       },
       // Disable caching by setting maintainState to false
-
     );
   }
 }
@@ -112,14 +107,14 @@ class _AthleteCardState extends State<AthleteCard> {
                   children: <Widget>[
                     IconButton(
                       icon: Icon(Icons.person),
-                       onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileScreen(),
-              ),
-            );
-          },
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileScreen(),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Icon(Icons.library_books_sharp),

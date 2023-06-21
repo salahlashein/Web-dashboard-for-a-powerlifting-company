@@ -1,10 +1,10 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:web_dashboard/models/userdata.dart';
-
 import '../services/userservice.dart';
 import 'manage_billing.dart';
 import 'componant/change_password.dart';
@@ -18,11 +18,15 @@ class SettingScreen extends StatefulWidget {
   State<SettingScreen> createState() => _SettingScreenState();
 }
 
+bool isLoadingUpdate = false;
+
 class _SettingScreenState extends State<SettingScreen> {
   String _coachName = '';
   List<CoachBillingModel> _coachBilling = [];
   List<ManageBillingModel> _manageBilling = [];
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late UploadTask uploadTask;
+  FirebaseStorage storage = FirebaseStorage.instance;
   UserDataModel userData = UserDataModel(
       firstName: 'firstName', lastName: 'lastName', email: 'email');
   @override
@@ -32,6 +36,8 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   bool isLoading = false;
+  bool isLoadingImage = false;
+
   Future<void> _loadCoachName() async {
     setState(() {
       isLoading = true;
@@ -97,6 +103,70 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
+  PlatformFile? _imageFile;
+  Future<void> _pickImage() async {
+    try {
+      FilePickerResult? result =
+          await FilePicker.platform.pickFiles(type: FileType.image);
+      if (result == null) return;
+      setState(() {
+        isLoadingImage = true;
+        _imageFile = result.files.first;
+      });
+      selectFile();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
+
+  selectFile() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Reference _reference = storage.ref().child('images/${_imageFile!.name}');
+      _reference
+          .putData(
+        await _imageFile!.bytes!,
+      )
+          .whenComplete(() async {
+        await _reference.getDownloadURL().then((valuee) {
+          _firestore
+              .collection('Coaches')
+              .doc(user.uid)
+              .update({"imagePath": valuee}).then((value) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Image Updated Successfuly!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            _loadCoachName();
+            setState(() {
+              isLoadingImage = false;
+            });
+          }).catchError((e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(e.toString()),
+                backgroundColor: Colors.red,
+              ),
+            );
+          });
+        }).catchError((e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+      });
+    }
+  }
+
   int selectedIndex = 0;
 
   @override
@@ -104,7 +174,7 @@ class _SettingScreenState extends State<SettingScreen> {
     List<Widget> screens = [
       EditEmail(isEditProfile: true, userDataModel: userData),
       EditEmail(isEditProfile: false, userDataModel: userData),
-      const ChangePassword(isChangePassword: true),
+      ChangePassword(),
       CoachBilling(coachBillingModel: _coachBilling),
       ManageBilling(manageBillingModel: _manageBilling),
     ];
@@ -128,30 +198,43 @@ class _SettingScreenState extends State<SettingScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Stack(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    children: const [
-                      CircleAvatar(
-                        radius: 35,
-                        backgroundImage: NetworkImage(
-                            'https://i.scdn.co/image/ab6765630000ba8a66ffe9bced4f416322aaa4c4'),
-                      ),
-                      CircleAvatar(
-                        radius: 10,
-                        child: Icon(
-                          Icons.edit,
-                          size: 12,
-                          color: Colors.white,
+                  GestureDetector(
+                    onTap: () {
+                      _pickImage();
+                    },
+                    child: Stack(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      children: [
+                        CircleAvatar(
+                          radius: 35,
+                          backgroundImage: NetworkImage(userData.imagePath ==
+                                      null ||
+                                  userData.imagePath == " "
+                              ? 'https://i.scdn.co/image/ab6765630000ba8a66ffe9bced4f416322aaa4c4'
+                              : userData.imagePath!),
+                          child: isLoadingImage == true
+                              ? CircularProgressIndicator(
+                                  color: Color(0xff5bc500),
+                                )
+                              : null,
                         ),
-                        backgroundColor: Color(0xff5bc500),
-                      ),
-                    ],
+                        CircleAvatar(
+                          radius: 10,
+                          child: Icon(
+                            Icons.edit,
+                            size: 12,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: Color(0xff5bc500),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text(
-                    'Zao Strength',
+                  Text(
+                    userData.firstName + ' ' + userData.lastName,
                     style: TextStyle(
                         color: Color(0xff5bc500),
                         fontSize: 12,

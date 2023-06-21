@@ -1,12 +1,12 @@
 class Block {
-  final String? id;
-  final String? name;
-  final String? programId;
+  final String id;
+  final String name;
+  final String programId;
 
   Block({
-    this.id,
-    this.name,
-    this.programId,
+    required this.id,
+    required this.name,
+    required this.programId,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,9 +19,9 @@ class Block {
 
   factory Block.fromJson(Map<String, dynamic> json) {
     return Block(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      programId: json['programId'] ?? '',
+      id: json['id'],
+      name: json['name'],
+      programId: json['pogramId'],
     );
   }
 }

@@ -12,6 +12,7 @@ class Workout {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'dayId': dayId,
       'exerciseId': exerciseId,
       'blockId': dayId,
     };
