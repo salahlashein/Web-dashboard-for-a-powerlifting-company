@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../models/exercise.dart';
 
-class Exercise_service {
+class ExerciseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<List<Exercise>> getExercisesForCoach(String coachId) async {

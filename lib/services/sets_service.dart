@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:web_dashboard/models/set.dart';
+import 'package:web_dashboard/models/setExersice.dart';
 
 class SetsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

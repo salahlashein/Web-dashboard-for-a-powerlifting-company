@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:web_dashboard/exercise.dart';
+import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
-import 'package:web_dashboard/models/set.dart';
+import 'package:web_dashboard/models/createprogrammodels.dart';
+
 import 'package:web_dashboard/services/exercise_service.dart';
 import 'package:web_dashboard/services/userservice.dart';
 
@@ -11,12 +12,65 @@ import 'models/exercise.dart';
 class ProgramScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var exerciseProvider = context.watch<ExerciseProvider>();
     return Scaffold(
-      body: Consumer<ExerciseProvider>(
-        builder: (context, exerciseProvider, _) => ListView.builder(
-          itemCount: exerciseProvider.blocks.length,
-          itemBuilder: (ctx, index) => BlockCard(blockIndex: index),
-        ),
+      appBar: AppBar(
+        title: Text('Program Screen'),
+      ),
+      body: Column(
+        children: [
+          StreamBuilder<List<Athlete>>(
+            stream: context
+                .read<UserService>()
+                .getAthletes(context.read<CoachProvider>().getcoach().id),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: snapshot.data!.isEmpty
+                    ? Text('No athletes found')
+                    : DropdownButton<String>(
+                        value: snapshot.data!
+                                .map((athlete) => athlete.id)
+                                .contains(
+                                    context.watch<ExerciseProvider>().athleteId)
+                            ? context.watch<ExerciseProvider>().athleteId
+                            : null,
+                        hint: Text('Please choose an athlete'),
+                        isExpanded: true,
+                        items: snapshot.data!
+                            .map<DropdownMenuItem<String>>((Athlete athlete) {
+                          return DropdownMenuItem<String>(
+                            value: athlete.id,
+                            child: Text(
+                                athlete.firstName + ' ' + athlete.lastName),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            context
+                                .read<ExerciseProvider>()
+                                .setAthleteId(newValue);
+                          }
+                        },
+                      ),
+              );
+            },
+          ),
+          Expanded(
+            child: Consumer<ExerciseProvider>(
+              builder: (context, exerciseProvider, _) => ListView.builder(
+                itemCount: exerciseProvider.blocks.length,
+                itemBuilder: (ctx, index) => BlockCard(blockIndex: index),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
@@ -27,6 +81,7 @@ class ProgramScreen extends StatelessWidget {
     );
   }
 }
+// ... rest of your code ...
 
 class BlockCard extends StatelessWidget {
   final int blockIndex;
@@ -108,57 +163,79 @@ class DayCard extends StatelessWidget {
   }
 }
 
-// The WorkoutCard and SetCard widgets should follow the same pattern as DayCard
 class WorkoutCard extends StatelessWidget {
   final int blockIndex;
   final int dayIndex;
   final int workoutIndex;
 
-  WorkoutCard(
-      {required this.blockIndex,
-      required this.dayIndex,
-      required this.workoutIndex});
+  WorkoutCard({
+    required this.blockIndex,
+    required this.dayIndex,
+    required this.workoutIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ExerciseProvider>(
-      builder: (context, exerciseProvider, _) {
-        var workout = exerciseProvider
-            .blocks[blockIndex].days[dayIndex].workouts[workoutIndex];
-        return Card(
-          color: Colors.blue,
-          child: Column(
-            children: [
-              DropdownButton<String>(
-                value: workout.selectedExercise,
-                hint: Text('Please choose a workout'),
-                items: exerciseProvider.exercises
-                    .map<DropdownMenuItem<String>>((Exercise exercise) {
-                  return DropdownMenuItem<String>(
-                    value: exercise.name,
-                    child: Text(exercise.name),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    workout.selectedExercise = newValue;
-                  }
-                },
+    return FutureBuilder<List<Exercise>>(
+      future: context
+          .read<ExerciseService>()
+          .getExercisesForCoach(context.read<CoachProvider>().getcoach().id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        }
+
+        return Consumer<ExerciseProvider>(
+          builder: (context, exerciseProvider, _) {
+            var workout = exerciseProvider
+                .blocks[blockIndex].days[dayIndex].workouts[workoutIndex];
+
+            return Card(
+              color: Colors.blue,
+              child: Column(
+                children: [
+                  DropdownButton<String>(
+                    value: workout.selectedExercise == null ||
+                            snapshot.data!
+                                    .where((exercise) =>
+                                        exercise.name ==
+                                        workout.selectedExercise)
+                                    .length ==
+                                0
+                        ? null
+                        : workout.selectedExercise,
+                    hint: Text('Please choose a workout'),
+                    items: snapshot.data!
+                        .map<DropdownMenuItem<String>>((Exercise exercise) {
+                      return DropdownMenuItem<String>(
+                        value: exercise.name,
+                        child: Text(exercise.name),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        workout.selectedExercise = newValue;
+                      }
+                    },
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: workout.sets.length,
+                    itemBuilder: (ctx, index) => SetCard(
+                      set: workout.sets[index],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => exerciseProvider.addSet(
+                        blockIndex, dayIndex, workoutIndex),
+                    child: Text('Add Set'),
+                  ),
+                ],
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: workout.sets.length,
-                itemBuilder: (ctx, index) => SetCard(
-                  set: workout.sets[index] as setExersice,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    exerciseProvider.addSet(blockIndex, dayIndex, workoutIndex),
-                child: Text('Add Set'),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -166,7 +243,7 @@ class WorkoutCard extends StatelessWidget {
 }
 
 class SetCard extends StatelessWidget {
-  final setExersice set;
+  final setExersice_p set;
 
   SetCard({required this.set});
 

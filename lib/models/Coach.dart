@@ -30,11 +30,11 @@ class Coach {
   // Convert a JSON string into a Coach
   factory Coach.fromJson(Map<String, dynamic> json) {
     return Coach(
-      id: json['id'],
+      id: json['id'] ?? '',
       email: json['email'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      imagePath: json['imagePath'],
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
+      imagePath: json['imagePath'] ?? '',
     );
   }
 }
