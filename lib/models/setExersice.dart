@@ -1,5 +1,7 @@
 class setExersice {
   String? id;
+  String? athleteId;
+
   String? workoutId;
   String? reps;
   String? intensity;
@@ -19,6 +21,7 @@ class setExersice {
     this.done,
     this.link,
     this.notes,
+    this.athleteId,
   });
 
   Map<String, dynamic> toJson() {
@@ -32,6 +35,7 @@ class setExersice {
       'done': done,
       'link': link,
       'notes': notes,
+      'athleteId': athleteId,
     };
   }
 
@@ -46,6 +50,7 @@ class setExersice {
       done: json['done'] ?? '',
       link: json['link'] ?? '',
       notes: json['notes'] ?? '',
+      athleteId: json['athleteId'] ?? '',
     );
   }
 }

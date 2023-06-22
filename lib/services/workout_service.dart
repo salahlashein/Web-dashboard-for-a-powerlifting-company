@@ -1,45 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:web_dashboard/models/Workout.dart';
+import 'package:web_dashboard/models/createprogrammodels.dart';
 
-class WorkoutService {
+class WorkoutService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> addWorkout(Workout workout) async {
-    CollectionReference collection =
-        FirebaseFirestore.instance.collection('Workout');
-
-    // Generate a new document reference with a unique ID, but don't put it in Firestore yet
-    DocumentReference documentReference = collection.doc();
-
-    // Add the document ID to the program data
-    Map<String, dynamic> programData = workout.toJson();
-    programData['id'] = documentReference.id;
-
-    return documentReference
-        .set(programData) // Store the program data in the new document
-        .then((_) {
-      print('Document added with ID: ${documentReference.id}');
-    }).catchError((e) {
-      print('Error adding document: $e');
-    });
-  }
-
-  Future<void> updateWorkout(Workout workout) async {
+  Future<String> addWorkout(
+      String dayId, Workout_p workout, String? exerciseId) async {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('workout');
-
-    // Convert the program to a JSON object
+    // Generate a new document reference with a unique ID, but don't put it in Firestore yet
+    DocumentReference documentReference = collection.doc(workout.id);
+    // Add the document ID and programId to the program data
     Map<String, dynamic> programData = workout.toJson();
-
-    return collection
-        .doc(workout.id) // Get the document with the provided id
-        .update(programData) // Update the document with the new data
-        .then((_) {
-      print('Document updated with ID: ${workout.id}');
-    }).catchError((e) {
-      print('Error updating document: $e');
-    });
+    programData['id'] = workout.id;
+    programData['dayID'] = dayId;
+    programData['exerciseId'] = exerciseId;
+    // add programId to programData
+    await documentReference.set(programData);
+    return documentReference.id;
   }
+
+  Future<void> updateWorkout(Workout_p workout) async {
+    await _db.doc(workout.id).set(workout.toJson());
+  }
+
 
   Future<void> deleteWorkout(Workout workout) async {
     CollectionReference collection =

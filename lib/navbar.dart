@@ -123,10 +123,12 @@ class _NavbarState extends State<Navbar> {
       String athleteEmail, String coachId) async {
     try {
       final String code = _generateRandomCode();
-      await FirebaseFirestore.instance
-          .collection('Athletes')
-          .doc()
-          .set({
+      final DocumentReference docRef =
+          FirebaseFirestore.instance.collection('Athletes').doc();
+      final String docId = docRef.id;
+
+      await docRef.set({
+        'id': docId,
         'randomCode': code,
         'coachId': coachId,
       });

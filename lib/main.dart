@@ -9,11 +9,16 @@ import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/createprogrammodels.dart';
 import 'package:web_dashboard/models/exercise.dart';
 import 'package:web_dashboard/services/auth.dart';
+import 'package:web_dashboard/services/block_service.dart';
+import 'package:web_dashboard/services/day_service.dart';
 import 'package:web_dashboard/services/exercise_service.dart';
+import 'package:web_dashboard/services/program_service.dart';
+import 'package:web_dashboard/services/sets_service.dart';
 import 'package:web_dashboard/services/userservice.dart';
+import 'package:web_dashboard/services/workout_service.dart';
 import 'package:web_dashboard/setting_screen/setting.dart';
 import 'package:web_dashboard/test.dart';
-
+import 'package:web_dashboard/providers/ProgramDataProvider.dart';
 import 'Register.dart';
 import 'athleatesList.dart';
 import 'login.dart';
@@ -51,11 +56,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<SetsService>(create: (_) => SetsService()),
+        ChangeNotifierProvider<WorkoutService>(create: (_) => WorkoutService()),
+        ChangeNotifierProvider<DayService>(create: (_) => DayService()),
+        ChangeNotifierProvider<ProgramDataProvider>(
+            create: (_) => ProgramDataProvider()),
+        ChangeNotifierProvider<BlockService>(create: (_) => BlockService()),
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => AthleteHoverNotifier()),
         ChangeNotifierProvider(create: (_) => CoachProvider()),
         ChangeNotifierProvider(create: (_) => ExerciseProvider()),
         ChangeNotifierProvider(create: (_) => UserService()),
+        ChangeNotifierProvider<UserService>(
+          create: (_) => UserService(),
+        ),
+        ChangeNotifierProvider<ExerciseProvider>(
+          create: (_) => ExerciseProvider(),
+        ),
+        ChangeNotifierProvider<ProgramService>(
+          // Use ChangeNotifierProvider
+          create: (_) => ProgramService(),
+        ),
         Provider(
           // regular Provider for ExerciseService
           create: (context) => ExerciseService(),

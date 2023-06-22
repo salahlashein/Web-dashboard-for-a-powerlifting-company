@@ -1,25 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:web_dashboard/models/block.dart';
+import 'package:web_dashboard/models/createprogrammodels.dart';
 
-class BlockService {
-  Future<void> addBlock(Block block) async {
+class BlockService extends ChangeNotifier {
+  Future<String> addBlock(String programId, Block_p block) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('Block');
-
+        FirebaseFirestore.instance.collection('block');
     // Generate a new document reference with a unique ID, but don't put it in Firestore yet
-    DocumentReference documentReference = collection.doc();
-
-    // Add the document ID to the program data
+    DocumentReference documentReference = collection.doc(block.id);
+    // Add the document ID and programId to the program data
     Map<String, dynamic> programData = block.toJson();
-    programData['id'] = documentReference.id;
-
-    return documentReference
-        .set(programData) // Store the program data in the new document
-        .then((_) {
-      print('Document added with ID: ${documentReference.id}');
-    }).catchError((e) {
-      print('Error adding document: $e');
-    });
+    programData['id'] = block.id;
+    programData['programId'] = programId; // add programId to programData
+    await documentReference.set(programData);
+    return documentReference.id;
   }
 
   Future<void> updateBlock(Block block) async {

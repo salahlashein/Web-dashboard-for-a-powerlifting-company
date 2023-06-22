@@ -1,16 +1,16 @@
 class Program {
-    final String id;
+    final String? id;
 
-  final String name;
-  final String coachId;
-  final String athleteId;
+  final String ?name;
+  final String ?coachId;
+  final String ?athleteId;
 
   Program({
-    required this.id,
+     this.id,
 
-    required this.name,
-    required this.coachId,
-    required this.athleteId,
+     this.name,
+     this.coachId,
+     this.athleteId,
   });
 
   Map<String, dynamic> toJson() {
