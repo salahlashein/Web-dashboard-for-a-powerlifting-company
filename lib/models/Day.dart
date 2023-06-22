@@ -1,28 +1,39 @@
 class Day {
-  final String? id;
-  final String? blockId;
-
-  final bool? done;
+  late String id;
+  late String blockId;
+  late String name;
+  late dynamic date;
+  // late String athleteId;
+  // final bool done;
 
   Day({
     required this.id,
     required this.blockId,
-    required this.done,
+    required this.name,
+    required this.date,
+    // required this.athleteId,
+    // required this.done,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'blockId': blockId,
-      'done': done,
+      'name': name,
+      'date': date,
+      // 'athleteId': athleteId,
+      // 'done': done,
     };
   }
 
   factory Day.fromJson(Map<String, dynamic> json) {
     return Day(
-      id: json['id'] ?? '',
-      blockId: json['blockId'] ?? '',
-      done: json['done'] ?? '',
+      id: json['id'],
+      blockId: json['blockId'],
+      name: json['name'],
+      date: json['date'],
+      // athleteId: json['athleteId'],
+      // done: json['done'],
     );
   }
 }

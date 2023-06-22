@@ -2,20 +2,27 @@ class UserDataModel {
   late String firstName;
   late String lastName;
   late String email;
+  String? imagePath;
   UserDataModel(
-      {required this.firstName, required this.lastName, required this.email});
+      {required this.firstName,
+      required this.lastName,
+      required this.email,
+      this.imagePath});
 
   UserDataModel.fromJson(Map<String, dynamic> json) {
     firstName = json['firstName'];
     lastName = json['lastName'];
     email = json['email'];
+    imagePath = json['imagePath'];
   }
   Map<String, dynamic> toMap() {
-    return {'firstName': firstName, 'lastName': lastName, 'email': email};
+    return {
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'imagePath': imagePath
+    };
   }
-
-  
-
 }
 
 class CoachBillingModel {
@@ -36,6 +43,7 @@ class CoachBillingModel {
 }
 
 class ManageBillingModel {
+  String? id;
   String? address1;
   String? address2;
   String? cardNum;
@@ -44,14 +52,16 @@ class ManageBillingModel {
   String? postalNum;
 
   ManageBillingModel(
-      {this.address1,
-      this.address2,
-      this.cardNum,
-      this.city,
-      this.country,
-      this.postalNum});
+      {required this.id,
+      required this.address1,
+      required this.address2,
+      required this.cardNum,
+      required this.city,
+      required this.country,
+      required this.postalNum});
 
   ManageBillingModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     address1 = json['address1'];
     address2 = json['address2'];
     cardNum = json['cardNum'];
@@ -60,14 +70,15 @@ class ManageBillingModel {
     postalNum = json['postalNum'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['address1'] = this.address1;
-    data['address2'] = this.address2;
-    data['cardNum'] = this.cardNum;
-    data['city'] = this.city;
-    data['country'] = this.country;
-    data['postalNum'] = this.postalNum;
-    return data;
+  Map<String, dynamic> toMap() {
+    return {
+      'address1': address1,
+      'id': id,
+      'address2': address2,
+      'cardNum': cardNum,
+      'city': city,
+      'country': country,
+      'postalNum': postalNum,
+    };
   }
 }
