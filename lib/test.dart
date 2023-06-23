@@ -33,62 +33,6 @@ class _CardScreenState extends State<CardScreen> {
     super.dispose();
   }
 
-  Future<void> addSet(String workoutId, BuildContext context) async {
-    final repsController = TextEditingController();
-    final intensityController = TextEditingController();
-    final loadController = TextEditingController();
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Add Set'),
-          content: Column(
-            children: [
-              TextField(
-                controller: repsController,
-                decoration: InputDecoration(hintText: "Reps"),
-              ),
-              TextField(
-                controller: intensityController,
-                decoration: InputDecoration(hintText: "Intensity"),
-              ),
-              TextField(
-                controller: loadController,
-                decoration: InputDecoration(hintText: "Load"),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text('Done'),
-              onPressed: () {
-                final reps = repsController.text;
-                final intensity = intensityController.text;
-                final load = loadController.text;
-
-                FirebaseFirestore.instance
-                    .collection('workouts')
-                    .doc(workoutId)
-                    .update({
-                  'data': FieldValue.arrayUnion([
-                    {
-                      'reps': reps,
-                      'intensity': intensity,
-                      'load': load,
-                    }
-                  ])
-                });
-
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void addBlock(String programId, BuildContext context) {
     String blockId = FirebaseFirestore.instance.collection('block').doc().id;
 
@@ -270,8 +214,10 @@ class _CardScreenState extends State<CardScreen> {
 
   Future<void> addProgram(String name) async {
     await programsCollection.add({
+      'id': programsCollection.id,
       'name': name,
-      'coachId': Provider.of<CoachProvider>(context, listen: false).getcoach(),
+      'coachId':
+          Provider.of<CoachProvider>(context, listen: false).getcoach().id,
       // Add other necessary fields here.
     });
   }
@@ -410,9 +356,11 @@ class _CardScreenState extends State<CardScreen> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<CardData>>(
-      stream: getPrograms(widget.coachId),
+      stream: getPrograms(
+          Provider.of<CoachProvider>(context, listen: false).getcoach().id),
       builder: (BuildContext context, AsyncSnapshot<List<CardData>> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -425,7 +373,16 @@ class _CardScreenState extends State<CardScreen> {
             itemCount: cardList.length + 1,
             itemBuilder: (context, index) {
               if (index == cardList.length) {
-                // ... Your code for adding a program ...
+                return Card(
+                  child: ListTile(
+                    tileColor: const Color.fromARGB(255, 82, 82, 82),
+                    title: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    onTap: _showAddProgramDialog,
+                  ),
+                );
               } else {
                 final programId = cardList[index].id;
 
@@ -482,7 +439,8 @@ class _CardScreenState extends State<CardScreen> {
                                               final dayId = dayList[index].id;
 
                                               return ExpansionTile(
-                                                backgroundColor: Colors.grey,
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 61, 61, 61),
                                                 title:
                                                     Text(dayList[index].name),
                                                 children: <Widget>[
@@ -518,31 +476,22 @@ class _CardScreenState extends State<CardScreen> {
                                                               .length,
                                                           itemBuilder:
                                                               (context, index) {
-                                                            final workout =
-                                                                workoutList[
-                                                                    index];
-                                                            return ExpansionTile(
-                                                              title: Text(workout
-                                                                      .exerciseName ??
-                                                                  ''),
-                                                              children: workout
-                                                                  .data
-                                                                  .map(
-                                                                      (dataMap) {
-                                                                final load =
-                                                                    dataMap['load']
-                                                                        as String;
-                                                                final intensity =
-                                                                    dataMap['intensity']
-                                                                        as String;
-                                                                final reps =
-                                                                    dataMap['reps']
-                                                                        as int;
-                                                                return ListTile(
-                                                                  title: Text(
-                                                                      'Load: $load, Intensity: $intensity, Reps: $reps'),
-                                                                );
-                                                              }).toList(),
+                                                            return Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: ListTile(
+                                                                tileColor: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        41,
+                                                                        41,
+                                                                        41),
+                                                                title: Text(
+                                                                    workoutList[index]
+                                                                            .exerciseName ??
+                                                                        ''),
+                                                              ),
                                                             );
                                                           },
                                                         );
@@ -634,19 +583,13 @@ class WorkoutData {
   final String id;
   final String exerciseId;
   String? exerciseName;
-  final List<Map<String, dynamic>> data;
 
-  WorkoutData(
-      {required this.exerciseId,
-      required this.id,
-      this.exerciseName,
-      required this.data});
+  WorkoutData({required this.exerciseId, required this.id, this.exerciseName});
 
   factory WorkoutData.fromJson(Map<String, dynamic> json) {
     return WorkoutData(
       id: json['id'] as String,
       exerciseId: json['exerciseId'] as String,
-      data: List<Map<String, dynamic>>.from(json['data'] as List),
     );
   }
 }
