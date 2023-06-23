@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/Coach.dart';
@@ -118,7 +119,14 @@ class _AthleteCardState extends State<AthleteCard> {
                     ),
                     IconButton(
                       icon: Icon(Icons.library_books_sharp),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Icon(Icons.restaurant_menu_outlined),
