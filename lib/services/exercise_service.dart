@@ -4,7 +4,7 @@ import '../models/exercise.dart';
 class ExerciseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<Exercise>> getExercisesForCoach(String coachId) async {
+  Future<List<Exercise>>? getExercisesForCoach(String coachId) async {
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
           .collection('exerciseLibrary')
