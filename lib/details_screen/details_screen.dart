@@ -1,19 +1,38 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:web_dashboard/services/program_service.dart';
+import 'package:web_dashboard/services/sets_service.dart';
+import 'dart:js' as js;
 
 import '../models/Day.dart';
 import '../models/Program.dart';
 import '../models/Workout.dart';
 import '../models/block.dart';
 import '../models/setExersice.dart';
+import '../services/block_service.dart';
+import '../services/day_service.dart';
+import '../services/workout_service.dart';
 
 Future<List<Workout>> getWorkout() async {
   try {
+    User? user = FirebaseAuth.instance.currentUser;
     QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('workout').get();
-    return snapshot.docs.map((e) => Workout.fromJson(e.data())).toList();
+        await FirebaseFirestore.instance
+            .collection('workout')
+            // .doc("f7f9c0a0-10b1-11ee-a2a8-23b6abbced55")
+            .get();
+    List<Workout> workout = snapshot.docs
+        .map((e) => Workout.fromJson(e.data()))
+        .where((element) => element.coachId == user!.uid)
+        .toList();
+    if (workout != null || workout.isNotEmpty) {
+      return workout;
+    } else {
+      return [];
+    }
   } catch (e) {
     print('Error get document: ${e.toString()}');
     return [];
@@ -121,82 +140,95 @@ class _DetailsScreenState extends State<DetailsScreen> {
             ))
           : Padding(
               padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                children: [
-                  const Text(
-                    'Workout 1',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(12.0),
-                    color: const Color(0xff454545),
-                    child: ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) =>
-                            workOutItem(context, index),
-                        separatorBuilder: (context, index) => const Divider(),
-                        itemCount: 4),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text('Workout 2',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 15),
-                  Container(
-                      padding: const EdgeInsets.all(12.0),
-                      color: const Color(0xff454545),
-                      child: ListView.separated(
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) =>
-                              workOutItem(context, index),
-                          separatorBuilder: (context, index) => const Divider(),
-                          itemCount: 4)),
-                  const SizedBox(height: 20),
-                  const Text('Workout 3',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 15),
-                  Container(
-                      padding: const EdgeInsets.all(12.0),
-                      color: const Color(0xff454545),
-                      child: ListView.separated(
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) =>
-                              workOutItem(context, index),
-                          separatorBuilder: (context, index) => const Divider(),
-                          itemCount: 4)),
-                ],
-              ),
+              child: workout.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'No workouts added yet!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          ElevatedButton(
+                              onPressed: () {},
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Color(0xff5bc500))),
+                              child: Text(
+                                'Add Workout',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  // fontSize: 30,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ))
+                        ],
+                      ),
+                    )
+                  : ListView(
+                      children: [
+                        ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return Wrap(
+                                children: [
+                                  Text(
+                                    'Workout ${index + 1}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Container(
+                                    padding: const EdgeInsets.all(12.0),
+                                    color: const Color(0xff454545),
+                                    child: ListView.separated(
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, indexx) {
+                                          return workOutItem(context,
+                                              workout[index].data![indexx]);
+                                        },
+                                        separatorBuilder: (context, index) =>
+                                            const Divider(),
+                                        itemCount: workout[index].data!.length),
+                                  ),
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 15),
+                            itemCount: workout.length),
+                      ],
+                    ),
             ),
     );
   }
 
-  Widget workOutItem(context, index) => Column(
+  Widget workOutItem(context, setExersice model) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (index != 0)
-            Row(
-              children: [
-                Icon(
-                  Icons.chat,
-                  color: Colors.deepPurple[800],
-                  size: 18,
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                const Text('Work up to 75% and perform 2 sets of 6-8 @8'),
-              ],
-            ),
-          if (index != 0) const SizedBox(height: 20),
+          Row(
+            children: [
+              Icon(
+                Icons.chat,
+                color: Colors.deepPurple[800],
+                size: 18,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Text(model.notes!),
+            ],
+          ),
+          const SizedBox(height: 20),
           Row(
             children: [
               Container(
@@ -224,39 +256,82 @@ class _DetailsScreenState extends State<DetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(
-                width: 5,
+              // const SizedBox(
+              //   width: 5,
+              // ),
+              customNumber(context, title: 'Sets', value: '2'),
+              customNumber(context, title: 'Reps', value: model.reps),
+              customNumber(context, title: 'RPE', value: model.RPE),
+              customNumber(context, title: 'Load', value: '${model.load}kg'),
+              customNumber(context,
+                  title: 'Intensty', value: '${model.intensity}%'),
+              Expanded(
+                flex: 2,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Link',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          js.context.callMethod('open', [model.link]);
+                        },
+                        child: Text(
+                          model.link!,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.blue,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-              customNumber(context, title: 'Sets', value: '1'),
-              customNumber(context, title: 'Reps', value: '7'),
-              customNumber(context, title: 'RPE', value: '8'),
-              customNumber(context, title: 'Load', value: '170 kg'),
-              customNumber(context, title: 'Intensty', value: '75%'),
-              const SizedBox(
-                width: 150,
-              ),
+
+              // const SizedBox(
+              //   width: 150,
+              // ),
             ],
           ),
         ],
       );
 
-  Widget customNumber(context, {required title, required value}) => Column(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            value,
-            style: TextStyle(
-                color: Colors.grey.shade400,
-                fontSize: 10,
-                fontWeight: FontWeight.w500),
-          ),
-        ],
+  Widget customNumber(context, {required title, required value}) => Expanded(
+        flex: 2,
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                  color: Colors.grey.shade400,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
       );
 }
