@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Athlete {
   final String id;
   final String firstName;
@@ -51,8 +54,7 @@ class Athlete {
       deadlift: json['deadlift'] ?? '',
       email: json['email'] ?? '',
       images: List<String>.from(json['images'] ?? []),
-      weights:
-          List<String>.from((json['weights'] ?? []).map((x) => x.toDouble())),
+      weights: List<String>.from((json['weights'] ?? [])),
     );
   }
 }

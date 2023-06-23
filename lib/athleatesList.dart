@@ -5,6 +5,7 @@ import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/services/userservice.dart';
+import 'package:web_dashboard/testatheid.dart';
 import 'profile.dart';
 
 class MyApp extends StatelessWidget {
@@ -49,7 +50,10 @@ class AthletesGrid extends StatelessWidget {
             crossAxisCount:
                 6, // Limit the maximum number of cards in a row to 6
             children: athletes
-                .map((athlete) => AthleteCard(athleteName: athlete.firstName))
+                .map((athlete) => AthleteCard(
+                      athleteName: athlete.firstName,
+                      athlete: athlete,
+                    ))
                 .toList(),
           );
         }
@@ -61,8 +65,9 @@ class AthletesGrid extends StatelessWidget {
 
 class AthleteCard extends StatefulWidget {
   final String athleteName;
+  final Athlete athlete;
 
-  AthleteCard({required this.athleteName});
+  AthleteCard({required this.athleteName, required this.athlete});
 
   @override
   _AthleteCardState createState() => _AthleteCardState();
@@ -112,7 +117,8 @@ class _AthleteCardState extends State<AthleteCard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfileScreen(),
+                            builder: (context) =>
+                                ProfilePage(athlete: widget.athlete),
                           ),
                         );
                       },
@@ -130,7 +136,15 @@ class _AthleteCardState extends State<AthleteCard> {
                     ),
                     IconButton(
                       icon: Icon(Icons.restaurant_menu_outlined),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProfileScreen(athlete: widget.athlete),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Icon(Icons.bar_chart),

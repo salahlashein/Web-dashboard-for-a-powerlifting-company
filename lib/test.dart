@@ -1,12 +1,12 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
 
 class CardScreen extends StatefulWidget {
   final String? coachId;
+  String? selectedAthlete;
 
   CardScreen({this.coachId});
 
@@ -21,6 +21,7 @@ class _CardScreenState extends State<CardScreen> {
   final workoutsCollection = FirebaseFirestore.instance.collection('workout');
   final exerciseLibraryCollection =
       FirebaseFirestore.instance.collection('exerciseLibrary');
+  final setsCollection = FirebaseFirestore.instance.collection('sets');
 
   final blockNameController = TextEditingController();
   final dayNameController = TextEditingController();
@@ -198,6 +199,136 @@ class _CardScreenState extends State<CardScreen> {
     );
   }
 
+  Stream<List<Athlete>> getAthletes(String? coachId) {
+    final athletesCollection =
+        FirebaseFirestore.instance.collection('Athletes');
+    final query = athletesCollection.where('coachId', isEqualTo: coachId);
+
+    return query.snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return Athlete.fromJson(data);
+      }).toList();
+    });
+  }
+
+  void _showAddAthleteDialog(String programId, String coachId) async {
+    // Fetch the athletes when function is called
+    List<Athlete> athletes = await getAthletes(coachId).first;
+    String? selectedAthleteId;
+
+    // Show dialog with dropdown menu
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Athlete'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return DropdownButton<String>(
+                value: selectedAthleteId,
+                items: athletes.map((Athlete athlete) {
+                  return DropdownMenuItem<String>(
+                    value: athlete.id,
+                    child: Text(athlete.firstName + ' ' + athlete.lastName),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedAthleteId = newValue;
+                  });
+                },
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Save the selected athlete's ID to Firestore when 'Done' is pressed
+                updateAthleteIdForProgram(programId, selectedAthleteId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Done'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> updateAthleteIdForProgram(String programId, String? athleteId) {
+    return FirebaseFirestore.instance
+        .collection('program')
+        .doc(programId)
+        .update({'athleteId': athleteId});
+  }
+
+  Future<void> _showAddSetDialog(String workoutId) async {
+    String reps = '';
+    String load = '';
+    String intensity = '';
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button to close dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey,
+          title: Text('Add new set'),
+          content: Column(
+            children: [
+              TextField(
+                onChanged: (value) {
+                  reps = value;
+                },
+                decoration: InputDecoration(hintText: "Enter reps"),
+              ),
+              TextField(
+                onChanged: (value) {
+                  load = value;
+                },
+                decoration: InputDecoration(hintText: "Enter load"),
+              ),
+              TextField(
+                onChanged: (value) {
+                  intensity = value;
+                },
+                decoration: InputDecoration(hintText: "Enter intensity"),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                addSet(workoutId, reps, load, intensity);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> addSet(
+      String workoutId, String reps, String load, String intensity) async {
+    var newSet = setsCollection.doc();
+    await newSet.set({
+      'id': newSet.id,
+      'workoutId': workoutId,
+      'reps': reps,
+      'load': load,
+      'intensity': intensity
+    });
+  }
+
   Stream<List<CardData>> getPrograms(String? coachId) {
     final query = programsCollection.where('coachId', isEqualTo: coachId);
 
@@ -212,14 +343,34 @@ class _CardScreenState extends State<CardScreen> {
     });
   }
 
+  Stream<List<SetsData>> getSetsForWorkout(String workoutId) {
+    final query = setsCollection.where('workoutId', isEqualTo: workoutId);
+
+    return query.snapshots().map((querySnapshot) {
+      if (querySnapshot.size == 0) {
+        // No documents found, return an empty list
+        return [];
+      } else {
+        return querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          var setData = SetsData.fromJson(data);
+          print('Set: ${setData.reps}');
+          return setData;
+        }).toList();
+      }
+    });
+  }
+
   Future<void> addProgram(String name) async {
-    await programsCollection.add({
-      'id': programsCollection.id,
+    DocumentReference docRef = await programsCollection.add({
       'name': name,
+      'athleteId': '',
       'coachId':
           Provider.of<CoachProvider>(context, listen: false).getcoach().id,
       // Add other necessary fields here.
     });
+
+    await docRef.update({'id': docRef.id});
   }
 
   Stream<List<BlockData>> getBlocks(String programId) {
@@ -258,19 +409,17 @@ class _CardScreenState extends State<CardScreen> {
     });
   }
 
-  Future<List<WorkoutData>> getWorkouts(String dayId) async {
+  Stream<List<WorkoutData>> getWorkouts(String dayId) {
     final query =
-        await workoutsCollection.where('dayId', isEqualTo: dayId).get();
+        workoutsCollection.where('dayId', isEqualTo: dayId).snapshots();
 
-    if (query.size == 0) {
-      // No documents found, return an empty list
-      return [];
-    } else {
-      List<WorkoutData> workoutList = [];
+    return query.asyncMap((querySnapshot) async {
+      final List<WorkoutData> workoutList =
+          []; // Declare workoutList with type <WorkoutData>
 
-      for (var doc in query.docs) {
+      for (var doc in querySnapshot.docs) {
         final data = doc.data();
-        var workoutData = WorkoutData.fromJson(data);
+        final workoutData = WorkoutData.fromJson(data);
 
         // Fetch exercise name based on exerciseId
         final exerciseId = workoutData.exerciseId;
@@ -289,11 +438,12 @@ class _CardScreenState extends State<CardScreen> {
       });
 
       return workoutList;
-    }
+    });
   }
 
   Future<String> fetchExerciseName(String exerciseId) async {
-    print('Fetching exercise for dayId: $exerciseId'); // Added for debugging
+    print(
+        'Fetching exercise for exerciseId: $exerciseId'); // Added for debugging
     final docSnapshot = await exerciseLibraryCollection.doc(exerciseId).get();
     if (docSnapshot.exists) {
       final data = docSnapshot.data();
@@ -416,6 +566,8 @@ class _CardScreenState extends State<CardScreen> {
                                       Color.fromARGB(255, 111, 111, 111),
                                   title: Text(blockList[index].name),
                                   children: <Widget>[
+                                    // day stream
+
                                     StreamBuilder<List<DayData>>(
                                       stream: getDays(blockId),
                                       builder: (BuildContext context,
@@ -444,26 +596,27 @@ class _CardScreenState extends State<CardScreen> {
                                                 title:
                                                     Text(dayList[index].name),
                                                 children: <Widget>[
-                                                  FutureBuilder<
+                                                  // workoutData
+
+                                                  StreamBuilder<
                                                       List<WorkoutData>>(
-                                                    future: getWorkouts(dayId),
+                                                    stream: getWorkouts(dayId),
                                                     builder: (BuildContext
                                                             context,
                                                         AsyncSnapshot<
                                                                 List<
                                                                     WorkoutData>>
                                                             snapshot) {
-                                                      if (snapshot
-                                                              .connectionState ==
-                                                          ConnectionState
-                                                              .waiting) {
-                                                        return CircularProgressIndicator();
-                                                      } else if (snapshot
-                                                          .hasError) {
+                                                      if (snapshot.hasError) {
                                                         print(
                                                             'Error in getWorkouts: ${snapshot.error}');
                                                         return Text(
                                                             'Error: ${snapshot.error}');
+                                                      } else if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return CircularProgressIndicator();
                                                       } else {
                                                         final workoutList =
                                                             snapshot.data ?? [];
@@ -476,21 +629,81 @@ class _CardScreenState extends State<CardScreen> {
                                                               .length,
                                                           itemBuilder:
                                                               (context, index) {
+                                                            final workoutId =
+                                                                workoutList[
+                                                                        index]
+                                                                    .id;
+
                                                             return Padding(
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(8.0),
-                                                              child: ListTile(
-                                                                tileColor: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        41,
-                                                                        41,
-                                                                        41),
+                                                              child:
+                                                                  ExpansionTile(
+                                                                backgroundColor:
+                                                                    Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            41,
+                                                                            41,
+                                                                            41),
                                                                 title: Text(
                                                                     workoutList[index]
                                                                             .exerciseName ??
                                                                         ''),
+                                                                children: <Widget>[
+                                                                  StreamBuilder<
+                                                                      List<
+                                                                          SetsData>>(
+                                                                    stream: getSetsForWorkout(
+                                                                        workoutId),
+                                                                    builder: (BuildContext
+                                                                            context,
+                                                                        AsyncSnapshot<List<SetsData>>
+                                                                            snapshot) {
+                                                                      if (snapshot
+                                                                          .hasError) {
+                                                                        return Text(
+                                                                            'Error: ${snapshot.error}');
+                                                                      } else if (snapshot
+                                                                              .connectionState ==
+                                                                          ConnectionState
+                                                                              .waiting) {
+                                                                        return CircularProgressIndicator();
+                                                                      } else {
+                                                                        final setsList =
+                                                                            snapshot.data ??
+                                                                                [];
+
+                                                                        return ListView
+                                                                            .builder(
+                                                                          shrinkWrap:
+                                                                              true,
+                                                                          physics:
+                                                                              NeverScrollableScrollPhysics(),
+                                                                          itemCount:
+                                                                              setsList.length,
+                                                                          itemBuilder:
+                                                                              (context, index) {
+                                                                            return ListTile(
+                                                                                title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                                                              Text("Reps: ${setsList[index].reps}"),
+                                                                              Text("Load: ${setsList[index].load}"),
+                                                                              Text("Intensity: ${setsList[index].intensity}")
+                                                                            ]));
+                                                                          },
+                                                                        );
+                                                                      }
+                                                                    },
+                                                                  ),
+                                                                  ElevatedButton(
+                                                                    onPressed: () =>
+                                                                        _showAddSetDialog(
+                                                                            workoutId),
+                                                                    child: Text(
+                                                                        'Add Set'),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             );
                                                           },
@@ -498,6 +711,7 @@ class _CardScreenState extends State<CardScreen> {
                                                       }
                                                     },
                                                   ),
+
                                                   ElevatedButton(
                                                     onPressed: () =>
                                                         addWorkout(dayId),
@@ -524,6 +738,11 @@ class _CardScreenState extends State<CardScreen> {
                       ElevatedButton(
                         onPressed: () => addBlock(programId, context),
                         child: Text('Add Block'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _showAddAthleteDialog(
+                            programId, 'ZpwXWSQI4qPmslV8TNRtSWzwKLa2'),
+                        child: Text('Add Athlete'),
                       ),
                     ],
                   ),
@@ -614,6 +833,42 @@ class ExerciseData {
     return {
       'id': id,
       'name': name,
+    };
+  }
+}
+
+class SetsData {
+  final String id;
+  final String reps;
+  final String load;
+  final String intensity;
+  final String notes;
+
+  SetsData({
+    required this.id,
+    required this.reps,
+    required this.load,
+    required this.intensity,
+    required this.notes,
+  });
+
+  factory SetsData.fromJson(Map<String, dynamic> json) {
+    return SetsData(
+      id: json['id'] ?? '',
+      reps: json['reps'] ?? '',
+      load: json['load'] ?? '',
+      intensity: json['intensity'] ?? '',
+      notes: json['notes'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'reps': reps,
+      'load': load,
+      'intensity': intensity,
+      'notes': notes,
     };
   }
 }
