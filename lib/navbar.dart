@@ -23,7 +23,7 @@ class _NavbarState extends State<Navbar> {
 
   final List<Widget> _widgetOptions = <Widget>[
     exercise(),
-    ProgramScreen(),
+    CardScreen(),
     CalendarScreen(),
     AthletesGrid(),
     chatPage(),
@@ -263,89 +263,52 @@ class _NavbarState extends State<Navbar> {
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text(
-                  'Exercise Library',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: Text('Training', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.layers, color: Colors.white),
+                icon: Icon(Icons.chat_bubble_outline, color: Colors.white),
                 selectedIcon: Icon(
-                  Icons.layers,
+                  Icons.chat_bubble_outline,
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text(
-                  'Templates',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: Text('Chat', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.people, color: Colors.white),
+                icon: Icon(Icons.calendar_today_outlined, color: Colors.white),
                 selectedIcon: Icon(
-                  Icons.people,
+                  Icons.calendar_today_outlined,
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text(
-                  'Athlete Overview',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: Text('Calendar', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.list, color: Colors.white),
+                icon: Icon(Icons.groups, color: Colors.white),
                 selectedIcon: Icon(
-                  Icons.list,
+                  Icons.groups,
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text(
-                  'Athlete List',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: Text('Athletes', style: TextStyle(color: Colors.white)),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.chat, color: Colors.white),
+                icon: Icon(Icons.message_outlined, color: Colors.white),
                 selectedIcon: Icon(
-                  Icons.chat,
+                  Icons.message_outlined,
                   size: 30,
                   color: Color.fromARGB(255, 9, 181, 152),
                 ),
-                label: Text(
-                  'Chat',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: Text('Messages', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
           VerticalDivider(thickness: 1, width: 1),
           Expanded(
-            child: Center(
-              child: _widgetOptions.elementAt(_selectedIndex),
-            ),
+            child: _widgetOptions.elementAt(_selectedIndex),
           ),
         ],
       ),
     );
   }
-}
-
-class App extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Your App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => Navbar(),
-      },
-    );
-  }
-}
-
-void main() {
-  runApp(App());
 }
