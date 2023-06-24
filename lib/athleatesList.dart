@@ -4,9 +4,10 @@ import 'package:web_dashboard/details_screen/details_screen.dart';
 import 'package:web_dashboard/models/Athlete.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/Coach.dart';
+import 'package:web_dashboard/Nutrition.dart';
+import 'package:web_dashboard/programView.dart';
 import 'package:web_dashboard/services/userservice.dart';
-import 'package:web_dashboard/testatheid.dart';
-import 'profile.dart';
+import 'package:web_dashboard/profilepage.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -104,7 +105,7 @@ class _AthleteCardState extends State<AthleteCard> {
             children: <Widget>[
               Visibility(
                 visible: !_isHovering,
-                child: Text(widget.athleteName),
+                child: Text(widget.athleteName + ' ' + widget.athlete.lastName),
               ),
               Visibility(
                 visible: _isHovering,
@@ -129,7 +130,8 @@ class _AthleteCardState extends State<AthleteCard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetailsScreen(),
+                            builder: (context) =>
+                                ProgramView(athlete: widget.athlete),
                           ),
                         );
                       },
@@ -141,7 +143,7 @@ class _AthleteCardState extends State<AthleteCard> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                ProfileScreen(athlete: widget.athlete),
+                                Nutrition(athlete: widget.athlete),
                           ),
                         );
                       },

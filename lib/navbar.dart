@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:web_dashboard/athleatesList.dart';
+import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/services/userservice.dart';
-import 'package:web_dashboard/test.dart';
+import 'package:web_dashboard/createprogram.dart';
 
 import 'athleteoverview.dart';
 import 'chatPage.dart';
@@ -20,9 +22,10 @@ class _NavbarState extends State<Navbar> {
   int _selectedIndex = 0;
   String _coachName = '';
   String _coachID = '';
-
+  late final String coachId;
+  User? user = FirebaseAuth.instance.currentUser;
   final List<Widget> _widgetOptions = <Widget>[
-    exercise(),
+    Exerciselibrary(coachId: ''),
     CardScreen(),
     CalendarScreen(),
     AthletesGrid(),
@@ -39,6 +42,8 @@ class _NavbarState extends State<Navbar> {
   void initState() {
     super.initState();
     _loadCoachName();
+    coachId = Provider.of<CoachProvider>(context, listen: false).getcoach().id;
+    _widgetOptions[0] = Exerciselibrary(coachId: coachId);
   }
 
   Future<void> _loadCoachName() async {

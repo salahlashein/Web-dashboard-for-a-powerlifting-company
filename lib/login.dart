@@ -41,7 +41,7 @@ class _LoginState extends State<Login> {
 
         Navigator.pushNamed(context, '/Navbar');
         print("Login successful");
-        print(Provider.of<CoachProvider>(context, listen: false).getcoach());
+        print(Provider.of<CoachProvider>(context, listen: false).getcoach().id);
       }
     } catch (e) {
       // Check if error message is provided by Firebase
