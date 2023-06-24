@@ -48,7 +48,8 @@ class Athlete {
       id: json['id'] ?? '',
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
-      imagePath: json['imagePath'] ?? '',
+      imagePath: json['imagePath'] ??
+          'https://firebasestorage.googleapis.com/v0/b/powerlifting-application-11263.appspot.com/o/progress_photos%2FHuGTSTBaJGPowITEjCFKSuIh3gX2%2F1687467358077_0.jpg?alt=media&token=62d58f0b-afc4-4127-80c9-509c6beef307',
       squat: json['squat'] ?? '',
       bench: json['bench'] ?? '',
       deadlift: json['deadlift'] ?? '',

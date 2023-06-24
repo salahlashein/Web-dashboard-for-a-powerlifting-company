@@ -37,7 +37,7 @@ class ExerciseProvider with ChangeNotifier {
 
     // Update the workout in Firestore
     String workoutId =
-        _blocks[blockIndex].days[dayIndex].workouts[workoutIndex].id!;
+        _blocks[blockIndex].days[dayIndex].workouts[workoutIndex].id;
     WorkoutService().updateWorkout(
         _blocks[blockIndex].days[dayIndex].workouts[workoutIndex]);
 
