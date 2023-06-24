@@ -6,6 +6,7 @@ import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/models/Coach.dart';
 import 'package:web_dashboard/Nutrition.dart';
 import 'package:web_dashboard/programView.dart';
+import 'package:web_dashboard/report.dart';
 import 'package:web_dashboard/services/userservice.dart';
 import 'package:web_dashboard/profilepage.dart';
 
@@ -150,7 +151,15 @@ class _AthleteCardState extends State<AthleteCard> {
                     ),
                     IconButton(
                       icon: Icon(Icons.bar_chart),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ReportScreen(athlete: widget.athlete),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

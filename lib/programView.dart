@@ -145,6 +145,50 @@ class _ProgramViewState extends State<ProgramView> {
     }
   }
 
+  void showSetDataDialog(BuildContext context, String setId) {
+    String link = '';
+    String actualLoad = '';
+    String RPE = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter your data'),
+          content: Column(
+            children: [
+              TextField(
+                onChanged: (value) => link = value,
+                decoration: InputDecoration(hintText: "Link"),
+              ),
+              TextField(
+                onChanged: (value) => actualLoad = value,
+                decoration: InputDecoration(hintText: "Actual Load"),
+              ),
+              TextField(
+                onChanged: (value) => RPE = value,
+                decoration: InputDecoration(hintText: "RPE"),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              child: Text('Save'),
+              onPressed: () {
+                setsCollection.doc(setId).update({
+                  'link': link,
+                  'actualLoad': actualLoad,
+                  'RPE': RPE,
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Stream<List<ExerciseData>> getExercises(String? coachId) {
     final query =
         exerciseLibraryCollection.where('coachId', isEqualTo: coachId);
@@ -252,8 +296,29 @@ class _ProgramViewState extends State<ProgramView> {
                                                   backgroundColor:
                                                       Color.fromARGB(
                                                           255, 61, 61, 61),
-                                                  title:
+                                                  title: Row(
+                                                    children: [
+                                                      Checkbox(
+                                                        value:
+                                                            dayList[index].done,
+                                                        onChanged:
+                                                            (bool? value) {
+                                                          setState(() {
+                                                            dayList[index]
+                                                                .done = value!;
+                                                            daysCollection
+                                                                .doc(dayList[
+                                                                        index]
+                                                                    .id)
+                                                                .update({
+                                                              'done': value
+                                                            });
+                                                          });
+                                                        },
+                                                      ),
                                                       Text(dayList[index].name),
+                                                    ],
+                                                  ),
                                                   children: <Widget>[
                                                     // workoutData
 
@@ -347,11 +412,22 @@ class _ProgramViewState extends State<ProgramView> {
                                                                             itemBuilder:
                                                                                 (context, index) {
                                                                               return ListTile(
-                                                                                  title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                                                                Text("Reps: ${setsList[index].reps}"),
-                                                                                Text("Load: ${setsList[index].load}"),
-                                                                                Text("Intensity: ${setsList[index].intensity}")
-                                                                              ]));
+                                                                                title: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    Text("Reps: ${setsList[index].reps}"),
+                                                                                    Text("Load: ${setsList[index].load}"),
+                                                                                    Text("Intensity: ${setsList[index].intensity}"),
+                                                                                    Text("Reps: ${setsList[index].reps}"),
+                                                                                    Text("Load: ${setsList[index].RPE}"),
+                                                                                    Text("Intensity: ${setsList[index].actualLoad}"),
+                                                                                    ElevatedButton(
+                                                                                      onPressed: () => showSetDataDialog(context, setsList[index].link),
+                                                                                      child: Text('Enter your data'),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              );
                                                                             },
                                                                           );
                                                                         }
@@ -423,14 +499,24 @@ class BlockData {
 class DayData {
   final String id;
   final String name;
+  bool done;
 
-  DayData({required this.name, required this.id});
+  DayData({required this.name, required this.id, this.done = false});
 
   factory DayData.fromJson(Map<String, dynamic> json) {
     return DayData(
       id: json['id'] as String,
       name: json['name'] as String,
+      done: json['done'] as bool? ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'done': done,
+    };
   }
 }
 
@@ -479,6 +565,9 @@ class SetsData {
   final String load;
   final String intensity;
   final String notes;
+  final String RPE;
+  final String actualLoad;
+  final String link;
 
   SetsData({
     required this.id,
@@ -486,6 +575,9 @@ class SetsData {
     required this.load,
     required this.intensity,
     required this.notes,
+    required this.RPE,
+    required this.actualLoad,
+    required this.link,
   });
 
   factory SetsData.fromJson(Map<String, dynamic> json) {
@@ -495,6 +587,9 @@ class SetsData {
       load: json['load'] ?? '',
       intensity: json['intensity'] ?? '',
       notes: json['notes'] ?? '',
+      RPE: json['RPE'] ?? '',
+      actualLoad: json['actualLoad'] ?? '',
+      link: json['link'] ?? '',
     );
   }
 
@@ -505,6 +600,9 @@ class SetsData {
       'load': load,
       'intensity': intensity,
       'notes': notes,
+      'RPE': RPE,
+      'actualLoad': actualLoad,
+      'link': link,
     };
   }
 }

@@ -8,12 +8,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:web_dashboard/models/Athlete.dart';
 //import 'package:web_dashboard/models/set.dart';
 
 class ReportScreen extends StatefulWidget {
   static const String id = "report_screen";
+  final Athlete athlete;
 
-  const ReportScreen({Key? key}) : super(key: key);
+  const ReportScreen({Key? key, required this.athlete}) : super(key: key);
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
@@ -26,7 +28,6 @@ class _ReportScreenState extends State<ReportScreen> {
   String? _load;
   String? _intensity;
 
-
   List<Map<String, dynamic>> _data = [];
   bool _isLoading = true;
 
@@ -35,36 +36,27 @@ class _ReportScreenState extends State<ReportScreen> {
 
   @override
   void initState() {
-    
     super.initState();
-  
-FirebaseFirestore.instance
-    .collection('day')
-    .get()
-    .then((snapshot) {
-print('Documents found: ${snapshot.docs.length}');
-  if (snapshot.docs.isNotEmpty) {
-    print('Document data: ${snapshot.docs.first.data()}');
-    setState(() {
-      _date = snapshot.docs.first.data()['date'];
+
+    FirebaseFirestore.instance.collection('day').get().then((snapshot) {
+      print('Documents found: ${snapshot.docs.length}');
+      if (snapshot.docs.isNotEmpty) {
+        print('Document data: ${snapshot.docs.first.data()}');
+        setState(() {
+          _date = snapshot.docs.first.data()['date'];
+        });
+      }
     });
-    
-  }
-  
-});
-    FirebaseFirestore.instance
-        .collection('sets')
-        .get()
-        .then((snapshot) {
+    FirebaseFirestore.instance.collection('sets').get().then((snapshot) {
       setState(() {
         _data = snapshot.docs.map((doc) => doc.data()).toList();
       });
     });
-  // void _fetchData() async {
-  //   final daySnapshot =
-  //       await FirebaseFirestore.instance.collection('day').get();
+    // void _fetchData() async {
+    //   final daySnapshot =
+    //       await FirebaseFirestore.instance.collection('day').get();
 
-  //   final dayData = daySnapshot.docs.map((doc) => doc.data()).toList();
+    //   final dayData = daySnapshot.docs.map((doc) => doc.data()).toList();
 
     // final setSnapshot =
     //     await FirebaseFirestore.instance.collection('sets').get();
@@ -87,7 +79,6 @@ print('Documents found: ${snapshot.docs.length}');
 
     setState(() {
       _isLoading = false;
-      
     });
   }
 
@@ -121,10 +112,10 @@ print('Documents found: ${snapshot.docs.length}');
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.green,
-          title: Text('Report'),
-          //actions: [IconButton(onPressed: () {}, icon: Icon(Icons.download))]
-          ),
+        backgroundColor: Colors.green,
+        title: Text('Report'),
+        //actions: [IconButton(onPressed: () {}, icon: Icon(Icons.download))]
+      ),
       body: _isLoading
           ? SpinKitWanderingCubes(
               color: Colors.cyan,
@@ -201,19 +192,19 @@ print('Documents found: ${snapshot.docs.length}');
             //   numeric: true,
             // ),
           ],
-          rows:_data
-                      .map(
-                        (data) => DataRow(
-                          cells: [
-                            DataCell(Text('$_date')),
-                            DataCell(Text(data['reps'])),
-                            DataCell(Text(data['RPE'])),
-                            DataCell(Text(data['load'])),
-                            DataCell(Text(data['intensity'])),
-                          ],
-                        ),
-                      )
-                      .toList(),
+          rows: _data
+              .map(
+                (data) => DataRow(
+                  cells: [
+                    DataCell(Text('$_date')),
+                    DataCell(Text(data['reps'])),
+                    DataCell(Text(data['RPE'])),
+                    DataCell(Text(data['load'])),
+                    DataCell(Text(data['intensity'])),
+                  ],
+                ),
+              )
+              .toList(),
         ),
       ),
     );
@@ -248,22 +239,31 @@ print('Documents found: ${snapshot.docs.length}');
                     )),
                 Expanded(
                     child: Container(
-                     // alignment: Alignment.centerLeft,
+                  // alignment: Alignment.centerLeft,
                   color: Colors.grey[900],
                   child: Column(
                     children: [
-                      SizedBox(height: 80,width: 80,
+                      SizedBox(
+                        height: 80,
+                        width: 80,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               //SizedBox(height: 0,),
-                              Text('62kg',style: TextStyle(height: 3, fontSize: 20),),
+                              Text(
+                                '62kg',
+                                style: TextStyle(height: 3, fontSize: 20),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      Text('Min',style: TextStyle(color: Colors.green,height: 0, fontSize: 15),)
+                      Text(
+                        'Min',
+                        style: TextStyle(
+                            color: Colors.green, height: 0, fontSize: 15),
+                      )
                     ],
                   ),
                 )),
@@ -272,18 +272,27 @@ print('Documents found: ${snapshot.docs.length}');
                   color: Colors.grey[900],
                   child: Column(
                     children: [
-                      SizedBox(height: 80,width: 80,
+                      SizedBox(
+                        height: 80,
+                        width: 80,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               //SizedBox(height: 0,),
-                              Text('75kg',style: TextStyle(height: 3, fontSize: 20),),
+                              Text(
+                                '75kg',
+                                style: TextStyle(height: 3, fontSize: 20),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      Text('Max',style: TextStyle(color: Colors.green,height: 0, fontSize: 15),)
+                      Text(
+                        'Max',
+                        style: TextStyle(
+                            color: Colors.green, height: 0, fontSize: 15),
+                      )
                     ],
                   ),
                 )),
@@ -292,18 +301,27 @@ print('Documents found: ${snapshot.docs.length}');
                   color: Colors.grey[900],
                   child: Column(
                     children: [
-                      SizedBox(height: 80,width: 80,
+                      SizedBox(
+                        height: 80,
+                        width: 80,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               //SizedBox(height: 0,),
-                              Text('+13kg',style: TextStyle(height: 3, fontSize: 20),),
+                              Text(
+                                '+13kg',
+                                style: TextStyle(height: 3, fontSize: 20),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      Text('Change',style: TextStyle(color: Colors.green,height: 0, fontSize: 15),)
+                      Text(
+                        'Change',
+                        style: TextStyle(
+                            color: Colors.green, height: 0, fontSize: 15),
+                      )
                     ],
                   ),
                 )),
@@ -339,10 +357,10 @@ print('Documents found: ${snapshot.docs.length}');
       case 2:
         text = const Text('June 27', style: style);
         break;
-         case 3:
+      case 3:
         text = const Text('June 30', style: style);
         break;
-        
+
       default:
         text = const Text('', style: style);
         break;
@@ -367,31 +385,31 @@ print('Documents found: ${snapshot.docs.length}');
       case 20:
         text = '62Kg';
         break;
-        case 30:
+      case 30:
         text = '64Kg';
         break;
       case 40:
         text = '66Kg';
         break;
-        case 50:
+      case 50:
         text = '68Kg';
         break;
       case 60:
         text = '70kg';
         break;
-        case 70:
+      case 70:
         text = '72Kg';
         break;
       case 80:
         text = '74kg';
         break;
-        case 90:
+      case 90:
         text = '76Kg';
         break;
       case 100:
         text = '78kg';
         break;
-        case 110:
+      case 110:
         text = '80Kg';
         break;
       // case 120:
